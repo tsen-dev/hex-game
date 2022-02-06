@@ -198,7 +198,7 @@ void testHexBoardCopyConstructor()
 
     for (int row = 0; row < board1Width; ++row) 
         for (int col = 0; col < board1Width; ++col) 
-            hexBoard1.MarkCell(col, col, HexCell::PLAYER1);
+            hexBoard1.MarkCell(col, row, HexCell::PLAYER1);
 
     HexBoard hexBoard3{hexBoard1};
 
@@ -219,6 +219,7 @@ void runTests()
     testGetCell();
     testGameWonByPlayer1();
     testGameWonByPlayer2();
+    testHexBoardCopyConstructor();
 }
 
 int main()
