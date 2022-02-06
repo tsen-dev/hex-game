@@ -19,9 +19,10 @@ class HexBoard
         bool IsGameWon();
         friend std::ostream& operator<<(std::ostream& out, const HexBoard& HexBoard);
 
+        const int Width;
+        const int Height;
+
     private:                
-        int Width;
-        int Height;
         HexCell** AdjacencyMatrix;
         bool **VisitedCells;
 

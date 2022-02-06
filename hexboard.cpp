@@ -2,10 +2,10 @@
 #include <iomanip>
 #include <vector>
 #include <algorithm>
-#include <random>
 
 #include "hexboard.h"
 #include "hexcell.h"
+#include "aiplayer.h"
 
 HexBoard::HexBoard(int width, int height) : Width{width}, Height{height}
 {
@@ -80,58 +80,10 @@ bool HexBoard::MarkCell(int xCoordinate, int yCoordinate, HexCell mark)
     }
 }
 
-void HexBoard::GetAIMove(std::pair<int, int>& move, int sampleCount)
-{
-    HexBoard currentBoard{*this};
-    std::default_random_engine rng{};
-    
-    int maxWins = 0;
-    std::vector<std::pair<int, int>> remainingMoves;
-
-    for (int row = 0; row < Height; ++row)
-        for (int col = 0; col < Width; ++col)
-            if (GetCell(col, row) == HexCell::EMPTY)
-                remainingMoves.push_back(std::pair<int, int>{col, row});                    
-
-    for (int i = 0; i < remainingMoves.size(); ++i)
-    {       
-        int wins = 0; 
-
-        for (int sample = 0; sample < sampleCount; ++sample)
-        {
-            std::vector<std::pair<int, int>> sampleRemainingMoves{remainingMoves};
-            HexBoard sampleBoard{currentBoard};
-            
-            sampleBoard.MarkCell(sampleRemainingMoves[i].first, sampleRemainingMoves[i].second, sampleBoard.CurrentPlayer);
-            sampleBoard.CurrentPlayer = (sampleBoard.CurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1;
-
-            sampleRemainingMoves.erase(sampleRemainingMoves.begin() + i);            
-            std::shuffle(sampleRemainingMoves.begin(), sampleRemainingMoves.end(), rng);
-
-            for (int j = 0; j < sampleRemainingMoves.size(); ++j)
-            {
-                std::pair<int, int>& currentMove = sampleRemainingMoves[j];
-                sampleBoard.MarkCell(currentMove.first, currentMove.second, sampleBoard.CurrentPlayer);
-                sampleBoard.CurrentPlayer = (sampleBoard.CurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1;
-            }
-
-            sampleBoard.CurrentPlayer = HexCell::PLAYER2;
-
-            if (sampleBoard.IsGameWon()) 
-                ++wins;
-        }
-
-        if (wins > maxWins) 
-        {
-            maxWins = wins;
-            move = remainingMoves[i];
-        }
-    }
-}
-
 void HexBoard::StartGame()
 {
     std::pair<int, int> move;
+    AIPlayer aiPlayer{1000};
 
     while (true)
     {
@@ -146,7 +98,7 @@ void HexBoard::StartGame()
         else 
         {
             std::cout << "Player 2's Turn:\n\n";
-            GetAIMove(move, 1000);
+            move = aiPlayer.GetMove(*this);
         }
         
         while (MarkCell(move.first, move.second, CurrentPlayer) == false) 
