@@ -173,7 +173,10 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
 {   
     int colHeaderWidth = numberOfDigits(hexboard.Width - 1);    
     int rowHeaderWidth = numberOfDigits(hexboard.Height - 1);    
-    int rowPadding = rowHeaderWidth;
+    int rowPadding = rowHeaderWidth + strlen("P1") + strlen(" ");
+    
+    // Print player 2's header
+    std::cout << std::setw(rowPadding + ((hexboard.Width - 1) * 4) / 2 - strlen("P2") / 2) << "" << "P2\n";
     
     // Print top column headers
     for (int col = 0; col < hexboard.Width; ++col)
@@ -187,13 +190,16 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
 
     for (int row = 0; row < hexboard.Height; ++row)
     {
-        // Print left row header
-        std::cout << std::setw(rowPadding) << std::right << row << " ";
+        if (row == hexboard.Height / 2) // Print player 1's header and left row header
+            std::cout << std::setw(rowPadding - rowHeaderWidth - strlen(" ")) << std::right << "P1" << ' ' << std::setw(rowHeaderWidth) << row << ' ';
+        else // Print left row header only
+            std::cout << std::setw(rowPadding) << std::right << row << ' ';
+        
         // Print row and horizontal links
         for (int col = 0; col < hexboard.Width - 1; ++col)
             std::cout << hexboard.GetCell(col, row) << " - ";
         // Print row's last cell and right row header
-        std::cout << hexboard.GetCell(hexboard.Width - 1, row) << ' ' << std::left << row << '\n';
+        std::cout << hexboard.GetCell(hexboard.Width - 1, row) << ' ' << std::left << row << '\n';        
 
         // Print links to cells below
         if (row < hexboard.Height - 1)
@@ -209,7 +215,7 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
     std::cout << std::setw(rowPadding + 2) << "" << std::left;
     for (int col = 0; col < hexboard.Width; ++col)
          std::cout << std::setw(colHeaderWidth) << col << std::setw(strlen("    ") - colHeaderWidth) << "";
-    std::cout << '\n';
+    std::cout << "\n\n";
 
     return out;
 }
