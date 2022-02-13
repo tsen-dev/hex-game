@@ -169,30 +169,25 @@ bool HexBoard::IsGameWon()
 
 std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
 {
-    int cellWidth = (hexboard.Width == 0 ? 1 : floor(log10(hexboard.Width))) + 2;
-    int columnHeaderPadding = 4 + cellWidth;
-    int middleColumn = columnHeaderPadding + (cellWidth + 1) * 3 / 2;
-
-    std::cout << std::right << std::setw(middleColumn) << "P2" << "\n\n"; // Write the player 2 header
-
-    // Write the column headers
-    std::cout << std::left << std::setw(columnHeaderPadding) << "";
-    for (int col = 0; col < hexboard.Width; ++col) std::cout << std::setw(cellWidth) << col << "  ";        
-    std::cout << '\n';
+    int padding = -1;
 
     for (int row = 0; row < hexboard.Height; ++row)
-    {        
-        // Write row and player 1 header
-        row == hexboard.Height / 2 ? std::cout << "P1 " << std::setw(2 * row) << "" : std::cout << std::setw(2 * row + 3) << "";        
-        std::cout << std::setw(cellWidth) << row << "  ";
+    {
+        std::cout << std::setw(++padding) << "";
+        for (int col = 0; col < hexboard.Width - 1; ++col)
+            std::cout << hexboard.GetCell(col, row) << " ~ ";
+        std::cout << hexboard.GetCell(hexboard.Width - 1, row) << '\n';
 
-        for (int col = 0; col < hexboard.Width; ++col) // Write the board contents
-            out << std::setw(cellWidth) << hexboard.GetCell(col, row) << "  ";
+        if (row < hexboard.Height - 1)
+        {
+            std::cout << std::setw(++padding) << "";
+            for (int col = 0; col < hexboard.Width - 1; ++col)
+                std::cout << "\\ / ";
+            std::cout << "\\ \n";
+        }
+    }  
 
-        std::cout << '\n';
-    }
+    std::cout << '\n';
 
-    std::cout << "\n" << std::right; // Return to default justification
-    
     return out;
 }
