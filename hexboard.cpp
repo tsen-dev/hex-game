@@ -167,26 +167,48 @@ bool HexBoard::IsGameWon()
     return isGameWon;
 }
 
+inline int numberOfDigits(int n) {return (n == 0) ? 1 : floor(log10(n)) + 1;}
+
 std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
-{
-    int padding = -1;
+{   
+    int colHeaderWidth = numberOfDigits(hexboard.Width - 1);    
+    int rowHeaderWidth = numberOfDigits(hexboard.Height - 1);    
+    int rowPadding = rowHeaderWidth;
+    
+    // Print top column headers
+    for (int col = 0; col < hexboard.Width; ++col)
+    {
+        if (col == 0) std::cout << std::setw(rowPadding) << "";
+        std::cout << std::setw(colHeaderWidth) << std::left << col << \
+        std::setw(strlen("    ") - colHeaderWidth) << "";
+    }
+   
+    std::cout << '\n';
 
     for (int row = 0; row < hexboard.Height; ++row)
     {
-        std::cout << std::setw(++padding) << "";
+        // Print left row header
+        std::cout << std::setw(rowPadding) << std::right << row << " ";
+        // Print row and horizontal links
         for (int col = 0; col < hexboard.Width - 1; ++col)
-            std::cout << hexboard.GetCell(col, row) << " ~ ";
-        std::cout << hexboard.GetCell(hexboard.Width - 1, row) << '\n';
+            std::cout << hexboard.GetCell(col, row) << " - ";
+        // Print row's last cell and right row header
+        std::cout << hexboard.GetCell(hexboard.Width - 1, row) << ' ' << std::left << row << '\n';
 
+        // Print links to cells below
         if (row < hexboard.Height - 1)
         {
-            std::cout << std::setw(++padding) << "";
+            std::cout << std::setw(rowPadding += 2) << "";
             for (int col = 0; col < hexboard.Width - 1; ++col)
                 std::cout << "\\ / ";
             std::cout << "\\ \n";
         }
-    }  
+    }
 
+    // Print bottom column headers
+    std::cout << std::setw(rowPadding + 2) << "" << std::left;
+    for (int col = 0; col < hexboard.Width; ++col)
+         std::cout << std::setw(colHeaderWidth) << col << std::setw(strlen("    ") - colHeaderWidth) << "";
     std::cout << '\n';
 
     return out;

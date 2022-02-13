@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-enum class HexCell : char {NO_CELL = '_', EMPTY = '-', PLAYER1 = 'X', PLAYER2 = 'O'};
+enum class HexCell : char {NO_CELL = '_', EMPTY = '.', PLAYER1 = 'X', PLAYER2 = 'O'};
 
 std::ostream& operator<<(std::ostream& out, const HexCell& hexCell);
 
