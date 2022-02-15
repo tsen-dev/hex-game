@@ -83,7 +83,7 @@ bool HexBoard::MarkCell(int xCoordinate, int yCoordinate, HexCell mark)
 void HexBoard::StartGame()
 {
     std::pair<int, int> move;
-    AIPlayer aiPlayer{1000};
+    AIPlayer aiPlayer{1000, *this};
 
     while (true)
     {
@@ -92,7 +92,7 @@ void HexBoard::StartGame()
         if (CurrentPlayer == HexCell::PLAYER1)
         {   
             std::cout << "Player 1's Turn:\n\n";         
-            std::cin >> move.first >> move.second;
+            std::cin >> move.first >> move.second;            
         }
 
         else 
@@ -104,6 +104,8 @@ void HexBoard::StartGame()
         while (MarkCell(move.first, move.second, CurrentPlayer) == false) 
             std::cin >> move.first >> move.second;
 
+        aiPlayer.RemovePlayedMove(move, Width);
+
         if (IsGameWon() == true) break;
         else CurrentPlayer = (CurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1; 
     }
@@ -111,7 +113,7 @@ void HexBoard::StartGame()
     std::cout << *this << (CurrentPlayer == HexCell::PLAYER1 ? "Player 1 Wins!\n\n" : "Player 2 Wins!\n\n");
 }
 
-bool HexBoard::TraversePathFromCell(int x, int y)
+bool HexBoard::TraversePathsFromCell(int x, int y)
 {
     switch (CurrentPlayer)
     {
@@ -122,22 +124,22 @@ bool HexBoard::TraversePathFromCell(int x, int y)
     VisitedCells[y][x] = true;
 
     if (GetCell(x - 1, y) == CurrentPlayer && VisitedCells[y][x - 1] == false)
-        if (TraversePathFromCell(x - 1, y) == true) return true;
+        if (TraversePathsFromCell(x - 1, y) == true) return true;
 
     if (GetCell(x - 1, y + 1) == CurrentPlayer && VisitedCells[y + 1][x - 1] == false)
-        if (TraversePathFromCell(x - 1, y + 1) == true) return true;
+        if (TraversePathsFromCell(x - 1, y + 1) == true) return true;
 
     if (GetCell(x, y - 1) == CurrentPlayer && VisitedCells[y - 1][x] == false)
-        if (TraversePathFromCell(x, y - 1) == true) return true;
+        if (TraversePathsFromCell(x, y - 1) == true) return true;
 
     if (GetCell(x, y + 1) == CurrentPlayer && VisitedCells[y + 1][x] == false)
-        if (TraversePathFromCell(x, y + 1) == true) return true;
+        if (TraversePathsFromCell(x, y + 1) == true) return true;
 
     if (GetCell(x + 1, y - 1) == CurrentPlayer && VisitedCells[y - 1][x + 1] == false)
-        if (TraversePathFromCell(x + 1, y - 1) == true) return true;
+        if (TraversePathsFromCell(x + 1, y - 1) == true) return true;
 
     if (GetCell(x + 1, y) == CurrentPlayer && VisitedCells[y][x + 1] == false)
-        if (TraversePathFromCell(x + 1, y) == true) return true;
+        if (TraversePathsFromCell(x + 1, y) == true) return true;
 
     return false;
 }
@@ -149,14 +151,14 @@ bool HexBoard::IsGameWon()
     if (CurrentPlayer == HexCell::PLAYER1)
     {
         for (int row = 0; row < Height; ++row)
-            if (GetCell(0, row) == CurrentPlayer && (isGameWon = TraversePathFromCell(0, row)) == true)
+            if (GetCell(0, row) == CurrentPlayer && (isGameWon = TraversePathsFromCell(0, row)) == true)
                 break;
     }
 
     else
     {
         for (int col = 0; col < Width; ++col)
-            if (GetCell(col, 0) == CurrentPlayer && (isGameWon = TraversePathFromCell(col, 0)) == true)
+            if (GetCell(col, 0) == CurrentPlayer && (isGameWon = TraversePathsFromCell(col, 0)) == true)
                 break;
     }
 
@@ -177,7 +179,7 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
     
     // Print player 2's header
     std::cout << std::setw(rowPadding + ((hexboard.Width - 1) * 4) / 2 - strlen("P2") / 2) << "" << "P2\n";
-    
+
     // Print top column headers
     for (int col = 0; col < hexboard.Width; ++col)
     {

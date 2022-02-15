@@ -3,6 +3,7 @@
 
 #include "hexboard.h"
 #include "hexcell.h"
+#include "aiplayer.h"
 #include "test.h"
 
 #ifdef TEST
@@ -212,6 +213,56 @@ void testHexBoardCopyConstructor()
     } 
 }
 
+void testGetRemainingMoves()
+{
+    int board1Width = 3;
+    int board1Height = 5;
+
+    HexBoard board{board1Width, board1Height};
+    
+    for (int i = 0; i < std::min(board1Width, board1Height); ++i)
+        board.MarkCell(i, i, HexCell::PLAYER1); 
+
+    AIPlayer aiPlayer{1000, board};
+
+    for (int row = 0; row < board.Height; ++row)
+    {
+        for (int col = 0; col < board.Width; ++col)
+        {
+            auto move = std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * board.Width + col);
+            bool moveFound = move != aiPlayer.RemainingMoves.end();
+            if (board.GetCell(col, row) == HexCell::EMPTY) assert(col == *move % board.Width && row == *move / board.Width);
+            else assert(move == aiPlayer.RemainingMoves.end());
+        }
+    }
+}
+
+void testRemovePlayedMove()
+{
+    int board1Width = 3;
+    int board1Height = 5;
+
+    HexBoard board{board1Width, board1Height};
+    AIPlayer aiPlayer{1000, board};
+
+    for (int i = 0; i < std::min(board1Width, board1Height); ++i)
+    {
+        board.MarkCell(i, i, HexCell::PLAYER1);
+        aiPlayer.RemovePlayedMove(std::pair<int, int>{i, i}, board.Width);
+    }
+
+    for (int row = 0; row < board.Height; ++row)
+    {
+        for (int col = 0; col < board.Width; ++col)
+        {
+            bool moveFound = 
+                std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * board.Width + col) 
+                != aiPlayer.RemainingMoves.end();
+            assert((board.GetCell(col, row) == HexCell::EMPTY && moveFound) || (board.GetCell(col, row) != HexCell::EMPTY && !moveFound));
+        }            
+    }
+}
+
 void runTests()
 {
     testCreateEmptyBoard();
@@ -220,6 +271,8 @@ void runTests()
     testGameWonByPlayer1();
     testGameWonByPlayer2();
     testHexBoardCopyConstructor();
+    testGetRemainingMoves();
+    testRemovePlayedMove();
 }
 
 int main()

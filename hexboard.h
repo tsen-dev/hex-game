@@ -26,7 +26,7 @@ class HexBoard
         HexCell** AdjacencyMatrix;
         bool **VisitedCells;
 
-        bool TraversePathFromCell(int x, int y);
+        bool TraversePathsFromCell(int x, int y);
         void GetAIMove(std::pair<int, int>& move, int sampleCount);
 };
 

@@ -7,7 +7,7 @@
 
 int main()
 {
-    HexBoard hexboard{5, 22};
+    HexBoard hexboard{11, 11};
 
     hexboard.StartGame();
 
