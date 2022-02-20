@@ -7,9 +7,9 @@
 
 int main()
 {
-    HexBoard hexboard{11, 11};
+    HexGame hexGame{11, 11};
 
-    hexboard.StartGame();
+    hexGame.StartGame();
 
     return 0;
 }

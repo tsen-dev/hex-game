@@ -7,69 +7,69 @@
 #include "hexcell.h"
 #include "aiplayer.h"
 
-HexBoard::HexBoard(int width, int height) : Width{width}, Height{height}
+HexGame::HexGame(int width, int height) : BoardWidth{width}, BoardHeight{height}
 {
     CurrentPlayer = HexCell::PLAYER1;
-    AdjacencyMatrix = new HexCell* [Height];
-    VisitedCells = new bool*[Height];
+    Board = new HexCell* [BoardHeight];
+    VisitedCells = new bool*[BoardHeight];
 
-    for (int row = 0; row < Height; ++row)
+    for (int row = 0; row < BoardHeight; ++row)
     {
-        AdjacencyMatrix[row] = new HexCell[Width];
-        VisitedCells[row] = new bool[Width];
+        Board[row] = new HexCell[BoardWidth];
+        VisitedCells[row] = new bool[BoardWidth];
 
-        for (int col = 0; col < Width; ++col)
+        for (int col = 0; col < BoardWidth; ++col)
         {
-            AdjacencyMatrix[row][col] = HexCell::EMPTY;
+            Board[row][col] = HexCell::EMPTY;
             VisitedCells[row][col] = false;
         }            
     }        
 }
 
-HexBoard::HexBoard(HexBoard& hexBoard) : Width{hexBoard.Width}, Height{hexBoard.Height}, CurrentPlayer{hexBoard.CurrentPlayer}
+HexGame::HexGame(HexGame& hexBoard) : BoardWidth{hexBoard.BoardWidth}, BoardHeight{hexBoard.BoardHeight}, CurrentPlayer{hexBoard.CurrentPlayer}
 {
-    AdjacencyMatrix = new HexCell* [Height];
-    VisitedCells = new bool*[Height];
+    Board = new HexCell* [BoardHeight];
+    VisitedCells = new bool*[BoardHeight];
 
-    for (int row = 0; row < Height; ++row)
+    for (int row = 0; row < BoardHeight; ++row)
     {
-        AdjacencyMatrix[row] = new HexCell[Width];
-        VisitedCells[row] = new bool[Width];
+        Board[row] = new HexCell[BoardWidth];
+        VisitedCells[row] = new bool[BoardWidth];
 
-        for (int col = 0; col < Width; ++col)
+        for (int col = 0; col < BoardWidth; ++col)
         {
-            AdjacencyMatrix[row][col] = hexBoard.AdjacencyMatrix[row][col];
+            Board[row][col] = hexBoard.Board[row][col];
             VisitedCells[row][col] = false;
         }            
     }
 }
 
-HexBoard::~HexBoard()
+HexGame::~HexGame()
 {
-    for (int row = 0; row < Height; ++row)
+    for (int row = 0; row < BoardHeight; ++row)
     {
-        delete[] AdjacencyMatrix[row];
+        delete[] Board[row];
         delete[] VisitedCells[row];
     }
         
-    delete[] AdjacencyMatrix;
+    delete[] Board;
     delete[] VisitedCells;
 }
 
-HexCell HexBoard::GetCell(int xCoordinate, int yCoordinate) const
+HexCell HexGame::GetCell(int xCoordinate, int yCoordinate) const
 {
-    if (xCoordinate < 0 || xCoordinate >= Width || yCoordinate < 0 || yCoordinate >= Height)    
+    if (xCoordinate < 0 || xCoordinate >= BoardWidth || yCoordinate < 0 || yCoordinate >= BoardHeight)    
         return HexCell::NO_CELL;
     else
-        return AdjacencyMatrix[yCoordinate][xCoordinate];        
+        return Board[yCoordinate][xCoordinate];        
 }
 
-bool HexBoard::MarkCell(int xCoordinate, int yCoordinate, HexCell mark)
+bool HexGame::MarkCell(int xCoordinate, int yCoordinate, HexCell mark)
 {
     switch (GetCell(xCoordinate, yCoordinate))
     {
         case HexCell::EMPTY:
-            AdjacencyMatrix[yCoordinate][xCoordinate] = mark;
+            Board[yCoordinate][xCoordinate] = mark;
             return true;
         case HexCell::NO_CELL:
             std::cerr << '(' << xCoordinate << ',' << yCoordinate << ") is out of bounds\n\n";
@@ -80,7 +80,7 @@ bool HexBoard::MarkCell(int xCoordinate, int yCoordinate, HexCell mark)
     }
 }
 
-void HexBoard::StartGame()
+void HexGame::StartGame()
 {
     std::pair<int, int> move;
     AIPlayer aiPlayer{1000, *this};
@@ -104,7 +104,7 @@ void HexBoard::StartGame()
         while (MarkCell(move.first, move.second, CurrentPlayer) == false) 
             std::cin >> move.first >> move.second;
 
-        aiPlayer.RemovePlayedMove(move, Width);
+        aiPlayer.RemovePlayedMove(move, BoardWidth);
 
         if (IsGameWon() == true) break;
         else CurrentPlayer = (CurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1; 
@@ -113,12 +113,12 @@ void HexBoard::StartGame()
     std::cout << *this << (CurrentPlayer == HexCell::PLAYER1 ? "Player 1 Wins!\n\n" : "Player 2 Wins!\n\n");
 }
 
-bool HexBoard::TraversePathsFromCell(int x, int y)
+bool HexGame::TraversePathsFromCell(int x, int y)
 {
     switch (CurrentPlayer)
     {
-        case HexCell::PLAYER1: if (x == Width - 1) return true; else break;
-        case HexCell::PLAYER2: if (y == Height - 1) return true; else break;
+        case HexCell::PLAYER1: if (x == BoardWidth - 1) return true; else break;
+        case HexCell::PLAYER2: if (y == BoardHeight - 1) return true; else break;
     }
 
     VisitedCells[y][x] = true;
@@ -144,26 +144,26 @@ bool HexBoard::TraversePathsFromCell(int x, int y)
     return false;
 }
 
-bool HexBoard::IsGameWon()
+bool HexGame::IsGameWon()
 {
     int isGameWon = false;
 
     if (CurrentPlayer == HexCell::PLAYER1)
     {
-        for (int row = 0; row < Height; ++row)
+        for (int row = 0; row < BoardHeight; ++row)
             if (GetCell(0, row) == CurrentPlayer && (isGameWon = TraversePathsFromCell(0, row)) == true)
                 break;
     }
 
     else
     {
-        for (int col = 0; col < Width; ++col)
+        for (int col = 0; col < BoardWidth; ++col)
             if (GetCell(col, 0) == CurrentPlayer && (isGameWon = TraversePathsFromCell(col, 0)) == true)
                 break;
     }
 
-    for (int row = 0; row < Height; ++row)
-        for (int col = 0; col < Width; ++col)
+    for (int row = 0; row < BoardHeight; ++row)
+        for (int col = 0; col < BoardWidth; ++col)
             VisitedCells[row][col] = false;
     
     return isGameWon;
@@ -171,17 +171,17 @@ bool HexBoard::IsGameWon()
 
 inline int numberOfDigits(int n) {return (n == 0) ? 1 : floor(log10(n)) + 1;}
 
-std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
+std::ostream& operator<<(std::ostream& out, const HexGame& hexboard)
 {   
-    int colHeaderWidth = numberOfDigits(hexboard.Width - 1);    
-    int rowHeaderWidth = numberOfDigits(hexboard.Height - 1);    
+    int colHeaderWidth = numberOfDigits(hexboard.BoardWidth - 1);    
+    int rowHeaderWidth = numberOfDigits(hexboard.BoardHeight - 1);    
     int rowPadding = rowHeaderWidth + strlen("P1") + strlen(" ");
     
     // Print player 2's header
-    std::cout << std::setw(rowPadding + ((hexboard.Width - 1) * 4) / 2 - strlen("P2") / 2) << "" << "P2\n";
+    std::cout << std::setw(rowPadding + ((hexboard.BoardWidth - 1) * 4) / 2 - strlen("P2") / 2) << "" << "P2\n";
 
     // Print top column headers
-    for (int col = 0; col < hexboard.Width; ++col)
+    for (int col = 0; col < hexboard.BoardWidth; ++col)
     {
         if (col == 0) std::cout << std::setw(rowPadding) << "";
         std::cout << std::setw(colHeaderWidth) << std::left << col << \
@@ -190,24 +190,24 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
    
     std::cout << '\n';
 
-    for (int row = 0; row < hexboard.Height; ++row)
+    for (int row = 0; row < hexboard.BoardHeight; ++row)
     {
-        if (row == hexboard.Height / 2) // Print player 1's header and left row header
+        if (row == hexboard.BoardHeight / 2) // Print player 1's header and left row header
             std::cout << std::setw(rowPadding - rowHeaderWidth - strlen(" ")) << std::right << "P1" << ' ' << std::setw(rowHeaderWidth) << row << ' ';
         else // Print left row header only
             std::cout << std::setw(rowPadding) << std::right << row << ' ';
         
         // Print row and horizontal links
-        for (int col = 0; col < hexboard.Width - 1; ++col)
+        for (int col = 0; col < hexboard.BoardWidth - 1; ++col)
             std::cout << hexboard.GetCell(col, row) << " - ";
         // Print row's last cell and right row header
-        std::cout << hexboard.GetCell(hexboard.Width - 1, row) << ' ' << std::left << row << '\n';        
+        std::cout << hexboard.GetCell(hexboard.BoardWidth - 1, row) << ' ' << std::left << row << '\n';        
 
         // Print links to cells below
-        if (row < hexboard.Height - 1)
+        if (row < hexboard.BoardHeight - 1)
         {
             std::cout << std::setw(rowPadding += 2) << "";
-            for (int col = 0; col < hexboard.Width - 1; ++col)
+            for (int col = 0; col < hexboard.BoardWidth - 1; ++col)
                 std::cout << "\\ / ";
             std::cout << "\\ \n";
         }
@@ -215,7 +215,7 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
 
     // Print bottom column headers
     std::cout << std::setw(rowPadding + 2) << "" << std::left;
-    for (int col = 0; col < hexboard.Width; ++col)
+    for (int col = 0; col < hexboard.BoardWidth; ++col)
          std::cout << std::setw(colHeaderWidth) << col << std::setw(strlen("    ") - colHeaderWidth) << "";
     std::cout << "\n\n";
 

@@ -1,33 +1,33 @@
-#ifndef HEXBOARD_H
-#define HEXBOARD_H
+#ifndef HEXGAME_H
+#define HEXGAME_H
 
 #include <iostream>
 
 #include "hexcell.h"
 
-class HexBoard
+class HexGame
 {
     public:
         HexCell CurrentPlayer;        
 
-        HexBoard(int width, int height);
-        HexBoard(HexBoard& hexBoard);
-        ~HexBoard();        
+        HexGame(int width, int height);
+        HexGame(HexGame& HexGame);
+        ~HexGame();        
         HexCell GetCell(int xCoordinate, int yCoordinate) const;
         bool MarkCell(int xCoordinate, int yCoordinate, HexCell mark);
         void StartGame();
         bool IsGameWon();
-        friend std::ostream& operator<<(std::ostream& out, const HexBoard& HexBoard);
+        friend std::ostream& operator<<(std::ostream& out, const HexGame& HexGame);
 
-        const int Width;
-        const int Height;
+        const int BoardWidth;
+        const int BoardHeight;
 
     private:                
-        HexCell** AdjacencyMatrix;
+        HexCell** Board;
         bool **VisitedCells;
 
         bool TraversePathsFromCell(int x, int y);
-        void GetAIMove(std::pair<int, int>& move, int sampleCount);
+        std::pair<int, int> GetAIMove(int sampleCount);
 };
 
 #endif
