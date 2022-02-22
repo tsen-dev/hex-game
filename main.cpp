@@ -7,7 +7,7 @@
 
 int main()
 {
-    startGame(11, 11);
+    startGame();
 
     return 0;
 }

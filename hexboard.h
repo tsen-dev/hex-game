@@ -22,7 +22,7 @@ class HexBoard
         const std::string P2Name;
 
         static const char EMPTY = '.';
-        static const char OUT_OF_BOUNDS = '_';
+        static const char OUT_OF_BOUNDS = '\0';
 
     private:                
         char** BoardState;

@@ -1,1 +1,6 @@
-void startGame(int width, int height);
+#ifndef HEX_H
+#define HEX_H
+
+void startGame();
+
+#endif

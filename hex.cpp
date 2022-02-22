@@ -1,15 +1,22 @@
 #include <iostream>
 #include <ctype.h>
 
+#include "hex.h"
+#include "settings.h"
 #include "hexboard.h"
 #include "aiplayer.h"
 
-void startGame(int width, int height)
+void startGame()
 {
-    std::pair<int, int> move;
-    HexBoard hexBoard{width, height, 'T', 'H', "Toprak", "Harrrry Osbourne"};
+    Settings settings{};
+    HexBoard hexBoard{
+        settings.BoardSize.first, settings.BoardSize.second, 
+        settings.PlayerMarkers.first, settings.PlayerMarkers.second, 
+        settings.PlayerNames.first, settings.PlayerNames.second
+    };
     AIPlayer aiPlayer{1000, hexBoard};
     char currentPlayer = hexBoard.P1;
+    std::pair<int, int> move;
     
     while (true)
     {
