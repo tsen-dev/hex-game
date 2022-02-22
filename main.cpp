@@ -1,15 +1,13 @@
 #include <iostream>
 
 #include "test.h"
-#include "hexboard.h"
+#include "hex.h"
 
 #ifndef TEST
 
 int main()
 {
-    HexGame hexGame{11, 11};
-
-    hexGame.StartGame();
+    startGame(11, 11);
 
     return 0;
 }

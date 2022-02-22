@@ -14,13 +14,13 @@ void testCreateEmptyBoard()
     
     int boardWidth = 3;
     int boardHeight = 5;    
-    HexGame hexGame{boardWidth, boardHeight};
+    HexBoard hexBoard{boardWidth, boardHeight};
     
     for (int yCoordinate = 0; yCoordinate < boardHeight; ++yCoordinate)
     {
         for (int xCoordinate = 0; xCoordinate < boardWidth; ++xCoordinate)
         {
-            assert(hexGame.GetCell(xCoordinate, yCoordinate) == HexCell::EMPTY);
+            assert(hexBoard.GetCell(xCoordinate, yCoordinate) == HexCell::EMPTY);
         }        
     }
 }
@@ -29,7 +29,7 @@ void testMarkCell()
 {
     int boardWidth = 5;
     int boardHeight = 3;   
-    HexGame hexGame{boardWidth, boardHeight};
+    HexBoard hexBoard{boardWidth, boardHeight};
 
     HexCell mark1 = HexCell::PLAYER1;
     HexCell mark2 = HexCell::PLAYER2;
@@ -42,20 +42,20 @@ void testMarkCell()
     // Check that the correct value is retrieved from that cell
     // Check that the same cell can't be marked again
 
-    assert(hexGame.MarkCell(0, 2, mark1) == true);
-    assert(hexGame.GetCell(0, 2) == mark1);
-    assert(hexGame.MarkCell(0, 2, mark1) == false);
+    assert(hexBoard.MarkCell(0, 2, mark1) == true);
+    assert(hexBoard.GetCell(0, 2) == mark1);
+    assert(hexBoard.MarkCell(0, 2, mark1) == false);
 
-    assert(hexGame.MarkCell(2, 0, mark2) == true);
-    assert(hexGame.GetCell(2, 0) == mark2);
-    assert(hexGame.MarkCell(2, 0, mark2) == false);
+    assert(hexBoard.MarkCell(2, 0, mark2) == true);
+    assert(hexBoard.GetCell(2, 0) == mark2);
+    assert(hexBoard.MarkCell(2, 0, mark2) == false);
 
     // Check that cells out of the game's bounds can't be marked
 
-    assert(hexGame.MarkCell(boardWidth, boardHeight, mark1) == false);
-    assert(hexGame.MarkCell(-1, -1, mark1) == false);
-    assert(hexGame.MarkCell(0, boardHeight, mark1) == false);
-    assert(hexGame.MarkCell(boardWidth, 0, mark1) == false);
+    assert(hexBoard.MarkCell(boardWidth, boardHeight, mark1) == false);
+    assert(hexBoard.MarkCell(-1, -1, mark1) == false);
+    assert(hexBoard.MarkCell(0, boardHeight, mark1) == false);
+    assert(hexBoard.MarkCell(boardWidth, 0, mark1) == false);
 
     // Unsuppress error output
     std::cerr.rdbuf(cerrBuffer);
@@ -66,18 +66,18 @@ void testGetCell()
     int boardWidth = 5;
     int boardHeight = 3;
 
-    HexGame hexGame{boardWidth, boardHeight};
+    HexBoard hexBoard{boardWidth, boardHeight};
 
     // Check that attempts to retrieve values of out of bounds cells are detected
 
-    assert(hexGame.GetCell(boardWidth, boardHeight) == HexCell::NO_CELL);
-    assert(hexGame.GetCell(-1, -1) == HexCell::NO_CELL);
-    assert(hexGame.GetCell(0, boardHeight) == HexCell::NO_CELL);
-    assert(hexGame.GetCell(boardWidth, 0) == HexCell::NO_CELL);
+    assert(hexBoard.GetCell(boardWidth, boardHeight) == HexCell::NO_CELL);
+    assert(hexBoard.GetCell(-1, -1) == HexCell::NO_CELL);
+    assert(hexBoard.GetCell(0, boardHeight) == HexCell::NO_CELL);
+    assert(hexBoard.GetCell(boardWidth, 0) == HexCell::NO_CELL);
     
     // Check that the correct value of retrieved for cell in the game's bounds
 
-    assert(hexGame.GetCell(boardWidth - 1, boardHeight - 1) == HexCell::EMPTY);
+    assert(hexBoard.GetCell(boardWidth - 1, boardHeight - 1) == HexCell::EMPTY);
 }
 
 void testGameWonByPlayer1()
@@ -88,17 +88,16 @@ void testGameWonByPlayer1()
     int board1Width = 7; 
     int board1Height = 7;
 
-    HexGame hexGame1{board1Width, board1Height};
-    hexGame1.CurrentPlayer = HexCell::PLAYER1;
+    HexBoard hexBoard1{board1Width, board1Height};
 
     for (int col = 0; col < board1Width - 1; ++col)
     {
-        hexGame1.MarkCell(col, 0, HexCell::PLAYER1);
-        assert(hexGame1.IsGameWon() == false);
+        hexBoard1.MarkCell(col, 0, HexCell::PLAYER1);
+        assert(hexBoard1.IsGameWon(HexCell::PLAYER1) == false);
     }    
 
-    hexGame1.MarkCell(board1Width - 1, 0, HexCell::PLAYER1);
-    assert(hexGame1.IsGameWon() == true);    
+    hexBoard1.MarkCell(board1Width - 1, 0, HexCell::PLAYER1);
+    assert(hexBoard1.IsGameWon(HexCell::PLAYER1) == true);    
 
     /* 
     Player 1 marks *connected* a diagonal path:
@@ -115,18 +114,17 @@ void testGameWonByPlayer1()
 
     int board2Width = 7;
 
-    HexGame hexGame2{board2Width, board2Width};
-    hexGame2.CurrentPlayer = HexCell::PLAYER1;
+    HexBoard hexBoard2{board2Width, board2Width};
 
     for (int col = 0; col < board2Width - 1; ++col)
     {
-        hexGame2.MarkCell(col, col, HexCell::PLAYER1);
-        hexGame2.MarkCell(col, col + 1, HexCell::PLAYER1);
-        assert(hexGame2.IsGameWon() == false);
+        hexBoard2.MarkCell(col, col, HexCell::PLAYER1);
+        hexBoard2.MarkCell(col, col + 1, HexCell::PLAYER1);
+        assert(hexBoard2.IsGameWon(HexCell::PLAYER1) == false);
     }
 
-    hexGame2.MarkCell(board2Width - 1, board2Width - 1, HexCell::PLAYER1);
-    assert(hexGame2.IsGameWon() == true);
+    hexBoard2.MarkCell(board2Width - 1, board2Width - 1, HexCell::PLAYER1);
+    assert(hexBoard2.IsGameWon(HexCell::PLAYER1) == true);
 
     /*
     Player 1 marks a complex path with branching and reversing:
@@ -148,20 +146,19 @@ void testGameWonByPlayer1()
 
     int board3Width = 7;
 
-    HexGame hexGame3{board3Width, board3Width};
-    hexGame3.CurrentPlayer = HexCell::PLAYER1;
+    HexBoard hexBoard3{board3Width, board3Width};
 
-    for (int row = 0; row < board3Width; ++row) hexGame3.MarkCell(0, row, HexCell::PLAYER1);
-    assert(hexGame3.IsGameWon() == false);
-    for (int col = 1; col < 5; ++col) hexGame3.MarkCell(col, 1, HexCell::PLAYER1);
-    assert(hexGame3.IsGameWon() == false);
-    for (int row = 2; row < 4; ++row) hexGame3.MarkCell(4, row, HexCell::PLAYER1);
-    assert(hexGame3.IsGameWon() == false);
-    hexGame3.MarkCell(3, 4, HexCell::PLAYER1);
-    hexGame3.MarkCell(2, 5, HexCell::PLAYER1);
-    assert(hexGame3.IsGameWon() == false);
-    for (int col = 2; col < board3Width; ++col) hexGame3.MarkCell(col, board3Width - 1, HexCell::PLAYER1);
-    assert(hexGame3.IsGameWon() == true);
+    for (int row = 0; row < board3Width; ++row) hexBoard3.MarkCell(0, row, HexCell::PLAYER1);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER1) == false);
+    for (int col = 1; col < 5; ++col) hexBoard3.MarkCell(col, 1, HexCell::PLAYER1);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER1) == false);
+    for (int row = 2; row < 4; ++row) hexBoard3.MarkCell(4, row, HexCell::PLAYER1);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER1) == false);
+    hexBoard3.MarkCell(3, 4, HexCell::PLAYER1);
+    hexBoard3.MarkCell(2, 5, HexCell::PLAYER1);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER1) == false);
+    for (int col = 2; col < board3Width; ++col) hexBoard3.MarkCell(col, board3Width - 1, HexCell::PLAYER1);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER1) == true);
 
     /* 
     Player 1 marks a disconnected diagonal path:
@@ -178,13 +175,12 @@ void testGameWonByPlayer1()
 
     int board4Width = 7;
 
-    HexGame hexGame4{board4Width, board4Width};
-    hexGame4.CurrentPlayer = HexCell::PLAYER1;
+    HexBoard hexBoard4{board4Width, board4Width};
 
     for (int col = 0; col < board4Width; ++col)
     {
-        hexGame4.MarkCell(col, col, HexCell::PLAYER1);
-        assert(hexGame4.IsGameWon() == false);
+        hexBoard4.MarkCell(col, col, HexCell::PLAYER1);
+        assert(hexBoard4.IsGameWon(HexCell::PLAYER1) == false);
     }
 }
 
@@ -196,17 +192,16 @@ void testGameWonByPlayer2()
     int board1Width = 7; 
     int board1Height = 7;
 
-    HexGame hexGame1{board1Width, board1Height};
-    hexGame1.CurrentPlayer = HexCell::PLAYER2;
+    HexBoard hexBoard1{board1Width, board1Height};
 
     for (int row = 0; row < board1Height - 1; ++row)
     {
-        hexGame1.MarkCell(0, row, HexCell::PLAYER2);
-        assert(hexGame1.IsGameWon() == false);
+        hexBoard1.MarkCell(0, row, HexCell::PLAYER2);
+        assert(hexBoard1.IsGameWon(HexCell::PLAYER2) == false);
     }    
 
-    hexGame1.MarkCell(0, board1Height - 1, HexCell::PLAYER2);
-    assert(hexGame1.IsGameWon() == true);
+    hexBoard1.MarkCell(0, board1Height - 1, HexCell::PLAYER2);
+    assert(hexBoard1.IsGameWon(HexCell::PLAYER2) == true);
 
     /* 
     Player 2 marks *connected* a diagonal path:
@@ -223,18 +218,17 @@ void testGameWonByPlayer2()
 
     int board2Height = 7;
 
-    HexGame hexGame2{board2Height, board2Height};
-    hexGame2.CurrentPlayer = HexCell::PLAYER2;
+    HexBoard hexBoard2{board2Height, board2Height};
 
     for (int row = 0; row < board2Height - 1; ++row)
     {
-        hexGame2.MarkCell(row, row, HexCell::PLAYER2);
-        hexGame2.MarkCell(row + 1, row, HexCell::PLAYER2);
-        assert(hexGame2.IsGameWon() == false);
+        hexBoard2.MarkCell(row, row, HexCell::PLAYER2);
+        hexBoard2.MarkCell(row + 1, row, HexCell::PLAYER2);
+        assert(hexBoard2.IsGameWon(HexCell::PLAYER2) == false);
     }
 
-    hexGame2.MarkCell(board2Height - 1, board2Height - 1, HexCell::PLAYER2);
-    assert(hexGame2.IsGameWon() == true);
+    hexBoard2.MarkCell(board2Height - 1, board2Height - 1, HexCell::PLAYER2);
+    assert(hexBoard2.IsGameWon(HexCell::PLAYER2) == true);
 
     /*
     Player 2 marks a complex path with branching and reversing:
@@ -256,20 +250,19 @@ void testGameWonByPlayer2()
 
     int board3Height = 7;
 
-    HexGame hexGame3{board3Height, board3Height};
-    hexGame3.CurrentPlayer = HexCell::PLAYER2;
+    HexBoard hexBoard3{board3Height, board3Height};
 
-    for (int col = 0; col < board3Height; ++col) hexGame3.MarkCell(col, 0, HexCell::PLAYER2);
-    assert(hexGame3.IsGameWon() == false);
-    for (int row = 1; row < 5; ++row) hexGame3.MarkCell(1, row, HexCell::PLAYER2);
-    assert(hexGame3.IsGameWon() == false);
-    for (int col = 2; col < 4; ++col) hexGame3.MarkCell(col, 4, HexCell::PLAYER2);
-    assert(hexGame3.IsGameWon() == false);
-    hexGame3.MarkCell(4, 3, HexCell::PLAYER2);
-    hexGame3.MarkCell(5, 2, HexCell::PLAYER2);
-    assert(hexGame3.IsGameWon() == false);
-    for (int row = 2; row < board3Height; ++row) hexGame3.MarkCell(board3Height - 1, row, HexCell::PLAYER2);
-    assert(hexGame3.IsGameWon() == true);
+    for (int col = 0; col < board3Height; ++col) hexBoard3.MarkCell(col, 0, HexCell::PLAYER2);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER2) == false);
+    for (int row = 1; row < 5; ++row) hexBoard3.MarkCell(1, row, HexCell::PLAYER2);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER2) == false);
+    for (int col = 2; col < 4; ++col) hexBoard3.MarkCell(col, 4, HexCell::PLAYER2);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER2) == false);
+    hexBoard3.MarkCell(4, 3, HexCell::PLAYER2);
+    hexBoard3.MarkCell(5, 2, HexCell::PLAYER2);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER2) == false);
+    for (int row = 2; row < board3Height; ++row) hexBoard3.MarkCell(board3Height - 1, row, HexCell::PLAYER2);
+    assert(hexBoard3.IsGameWon(HexCell::PLAYER2) == true);
 
     /* 
     Player 2 marks a disconnected diagonal path:
@@ -286,101 +279,121 @@ void testGameWonByPlayer2()
 
     int board4Height = 7;
 
-    HexGame hexGame4{board4Height, board4Height};
-    hexGame4.CurrentPlayer = HexCell::PLAYER2;
+    HexBoard hexBoard4{board4Height, board4Height};
 
     for (int row = 0; row < board4Height; ++row)
     {
-        hexGame4.MarkCell(row, row, HexCell::PLAYER2);
-        assert(hexGame4.IsGameWon() == false);
+        hexBoard4.MarkCell(row, row, HexCell::PLAYER2);
+        assert(hexBoard4.IsGameWon(HexCell::PLAYER2) == false);
     }
 }
 
-void testHexBoardCopyConstructor()
+void testCopyBoardState()
 {
-    // An empty hexGame (board1) is used to copy construct another hexGame (board2)
-    // Player 1 marks all the cells of board1, which is then used to copy construct a new hexGame (board3)
-    // Check that the state of board1 and hexGame 2 are not equal, and the state of board1 and board3 are equal
+    // An empty hexBoard (board1) is copied into another hexBoard (board2)
+    // Player 1 marks all the cells of board1, which is then copied into a new hexBoard (board3)
+    // Check that (1) the state of board1 and hexBoard 2 are not equal, (2) the state of board1 and board3 are equal
 
     int board1Width = 3;
 
-    HexGame hexGame1{board1Width, board1Width};
-    hexGame1.CurrentPlayer = HexCell::PLAYER1;
-    
-    HexGame hexGame2{hexGame1};
+    HexBoard hexBoard1{board1Width, board1Width};
+    HexBoard hexBoard2{board1Width, board1Width};
+
+    // Check that copying boards of equal size returns no errors
+    assert(CopyBoardState(hexBoard2, hexBoard1) == true);
 
     for (int row = 0; row < board1Width; ++row) 
         for (int col = 0; col < board1Width; ++col) 
-            hexGame1.MarkCell(col, row, HexCell::PLAYER1);
+            hexBoard1.MarkCell(col, row, HexCell::PLAYER1);
 
-    HexGame hexGame3{hexGame1};
+    HexBoard hexBoard3{board1Width, board1Width};
+
+    // Check that copying boards of equal size returns no errors
+    assert(CopyBoardState(hexBoard3, hexBoard1) == true);
 
     for (int row = 0; row < board1Width; ++row)
     {
         for (int col = 0; col < board1Width; ++col)
         {
-            assert(hexGame1.GetCell(col, row) != hexGame2.GetCell(col, row));
-            assert(hexGame1.GetCell(col, row) == hexGame3.GetCell(col, row));
+            assert(hexBoard1.GetCell(col, row) != hexBoard2.GetCell(col, row));
+            assert(hexBoard1.GetCell(col, row) == hexBoard3.GetCell(col, row));
         }
-    } 
+    }
+
+    // Check that copying boards of unequal size returns an error
+
+    HexBoard hexBoard4{board1Width + 1, board1Width};
+    HexBoard hexBoard5{board1Width, board1Width + 1};
+    HexBoard hexBoard6{board1Width + 1, board1Width + 1};
+
+    assert(CopyBoardState(hexBoard3, hexBoard4) == false);
+    assert(CopyBoardState(hexBoard3, hexBoard5) == false);
+    assert(CopyBoardState(hexBoard3, hexBoard6) == false);
 }
 
-void testGetRemainingMoves()
+void testAIPlayerConstructor()
 {
     int board1Width = 3;
     int board1Height = 5;
 
-    HexGame hexGame{board1Width, board1Height};
+    HexBoard hexBoard{board1Width, board1Height};
     
     // Player 1 marks some cells i.e. plays some moves
 
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
-        hexGame.MarkCell(i, i, HexCell::PLAYER1); 
+        hexBoard.MarkCell(i, i, HexCell::PLAYER1); 
 
-    AIPlayer aiPlayer{1000, hexGame};
+    AIPlayer aiPlayer{1000, hexBoard};
 
     // Check that:
     // (1) all unoccupied cells are available to aiPlayer as a move, and no occupied cells are
     // (2) the encodings of the cells' (x, y) pairs as single integers are correct 
 
-    for (int row = 0; row < hexGame.BoardHeight; ++row)
+    for (int row = 0; row < hexBoard.Height; ++row)
     {
-        for (int col = 0; col < hexGame.BoardWidth; ++col)
+        for (int col = 0; col < hexBoard.Width; ++col)
         {
-            auto move = std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * hexGame.BoardWidth + col);
+            auto move = std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * hexBoard.Width + col);
             bool moveFound = move != aiPlayer.RemainingMoves.end();
-            if (hexGame.GetCell(col, row) == HexCell::EMPTY) 
-                assert(col == *move % hexGame.BoardWidth && row == *move / hexGame.BoardWidth);
+            if (hexBoard.GetCell(col, row) == HexCell::EMPTY) 
+                assert(col == *move % hexBoard.Width && row == *move / hexBoard.Width);
             else 
                 assert(move == aiPlayer.RemainingMoves.end());
         }
     }
 }
 
-void testRemovePlayedMove()
+void testRemoveMove()
 {
     int board1Width = 3;
     int board1Height = 5;
 
-    HexGame board{board1Width, board1Height};
+    HexBoard board{board1Width, board1Height};
     AIPlayer aiPlayer{1000, board};
 
-    // Check that each move made by Player 1 is removed from aiPlayer's list of available moves
+    // Check that:
+    // (1) Each played move is removed from aiPlayer's list of available moves
+    // (2) the state of aiPlayer's board is kept consistent with the main board
+
 
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
     {
         board.MarkCell(i, i, HexCell::PLAYER1);
-        aiPlayer.RemovePlayedMove(std::pair<int, int>{i, i}, board.BoardWidth);
+        aiPlayer.RemoveMove(std::pair<int, int>{i, i}, HexCell::PLAYER1);
     }
 
-    for (int row = 0; row < board.BoardHeight; ++row)
+    board.MarkCell(board1Width - 1, board1Height - 1, HexCell::PLAYER2);
+    aiPlayer.RemoveMove(std::pair<int, int>{board1Width - 1, board1Height - 1}, HexCell::PLAYER2);
+
+    for (int row = 0; row < board.Height; ++row)
     {
-        for (int col = 0; col < board.BoardWidth; ++col)
+        for (int col = 0; col < board.Width; ++col)
         {
             bool moveFound = 
-                std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * board.BoardWidth + col) 
+                std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * board.Width + col) 
                 != aiPlayer.RemainingMoves.end();
             assert((board.GetCell(col, row) == HexCell::EMPTY && moveFound) || (board.GetCell(col, row) != HexCell::EMPTY && !moveFound));
+            assert(board.GetCell(col, row) == aiPlayer.Board.GetCell(col, row));
         }            
     }
 }
@@ -392,9 +405,9 @@ void runTests()
     testGetCell();
     testGameWonByPlayer1();
     testGameWonByPlayer2();
-    testHexBoardCopyConstructor();
-    testGetRemainingMoves();
-    testRemovePlayedMove();
+    testCopyBoardState();
+    testAIPlayerConstructor();
+    testRemoveMove();
 }
 
 int main()

@@ -2,22 +2,25 @@
 #define AIPLAYER_H
 
 #include <vector>
+#include <random>
 
 #include "hexboard.h"
+#include "hexcell.h"
 
 class AIPlayer
 {
     public:
-        AIPlayer(int sampleCount, HexGame& board);
-        std::pair<int, int> GetMove(HexGame& board);
-        void RemovePlayedMove(std::pair<int, int>& move, int boardWidth);
-        std::vector<int> RemainingMoves;
+        AIPlayer(int sampleCount, HexBoard& hexBoard);
+        std::pair<int, int> GetMove();
+        void RemoveMove(std::pair<int, int>& move, HexCell player);        
+        friend void testAIPlayerConstructor();
+        friend void testRemoveMove();
 
     private:
-        void GetRemainingMoves(HexGame& game);
-
         int SampleCount;
-        
+        std::vector<int> RemainingMoves;        
+        HexBoard Board, MoveBoard, SampleBoard;
+        std::default_random_engine RandomEngine;
 };
 
 #endif

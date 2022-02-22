@@ -4,35 +4,28 @@
 #include "aiplayer.h"
 #include "hexboard.h"
 
-void AIPlayer::RemovePlayedMove(std::pair<int, int>& move, int boardWidth)
+AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard) : SampleCount{sampleCount}, RandomEngine{static_cast<unsigned int>(time(nullptr))}, Board{hexBoard.Width, hexBoard.Height}, MoveBoard{hexBoard.Width, hexBoard.Height}, SampleBoard{hexBoard.Width, hexBoard.Height}
 {
+    for (int row = 0; row < hexBoard.Height; ++row)
+        for (int col = 0; col < hexBoard.Width; ++col)
+            if (hexBoard.GetCell(col, row) == HexCell::EMPTY)
+                RemainingMoves.push_back(row * hexBoard.Width + col); 
+}
+
+void AIPlayer::RemoveMove(std::pair<int, int>& move, HexCell player)
+{
+    Board.MarkCell(move.first, move.second, player);
+
     RemainingMoves.erase(
-        std::find(RemainingMoves.begin(), RemainingMoves.end(), move.second * boardWidth + move.first));
+        std::find(RemainingMoves.begin(), RemainingMoves.end(), move.second * Board.Width + move.first));
 }
 
-void AIPlayer::GetRemainingMoves(HexGame& game)
+std::pair<int, int> AIPlayer::GetMove()
 {
-    for (int row = 0; row < game.BoardHeight; ++row)
-        for (int col = 0; col < game.BoardWidth; ++col)
-            if (game.GetCell(col, row) == HexCell::EMPTY)
-                RemainingMoves.push_back(row * game.BoardWidth + col); 
-}
-
-AIPlayer::AIPlayer(int sampleCount, HexGame& game) : SampleCount{sampleCount} 
-{
-    GetRemainingMoves(game);
-}
-
-std::pair<int, int> AIPlayer::GetMove(HexGame& game)
-{
-    clock_t starttime;
-    clock_t shuffletime = 0;
-    clock_t getmovetime = clock();    
-
-    // Rng could be a member of aiplayer
-    std::default_random_engine rng{static_cast<unsigned int>(time(nullptr))};
+    std::pair<int, int> move;   
+    HexCell currentPlayer = HexCell::PLAYER2;
+    HexCell sampleCurrentPlayer;
     int maxWins = 0;
-    std::pair<int, int> move;
 
     for (int i = 0; i < RemainingMoves.size(); ++i)
     {            
@@ -40,49 +33,36 @@ std::pair<int, int> AIPlayer::GetMove(HexGame& game)
         std::swap(sampleRemainingMoves[i], sampleRemainingMoves[sampleRemainingMoves.size() - 1]); // Moving the move to the end before removing to make removal constant time        
         int moveWinCount = 0; 
 
-        HexGame moveGame{game};
-        moveGame.MarkCell(sampleRemainingMoves.back() % moveGame.BoardWidth, sampleRemainingMoves.back() / moveGame.BoardWidth, moveGame.CurrentPlayer);
-        moveGame.CurrentPlayer = (moveGame.CurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1; // A (simulated move was played, so change current player)
+        CopyBoardState(MoveBoard, Board);
+        MoveBoard.MarkCell(sampleRemainingMoves.back() % MoveBoard.Width, sampleRemainingMoves.back() / MoveBoard.Width, currentPlayer);
 
         sampleRemainingMoves.pop_back();
 
         for (int sample = 0; sample < SampleCount; ++sample)
         {   
-            // Creating a new game here at every iteration which calls OS to allocate memory:
-            // Could declare a game before the for loop and set its initial value at each iteration using assignment operator                      
-            HexGame sampleGame{moveGame};    
+            sampleCurrentPlayer = (currentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1; // A (simulated move was played, so change current player);
 
-            starttime = clock();
-            // shuffle using fisher yates algorithm
-            std::shuffle(sampleRemainingMoves.begin(), sampleRemainingMoves.end(), rng);
-            shuffletime += clock() - starttime;
+            CopyBoardState(SampleBoard, MoveBoard);    
+
+            std::shuffle(sampleRemainingMoves.begin(), sampleRemainingMoves.end(), RandomEngine);
 
             for (int j = 0; j < sampleRemainingMoves.size(); ++j)
             {
-                sampleGame.MarkCell(sampleRemainingMoves[j] % moveGame.BoardWidth, sampleRemainingMoves[j] / moveGame.BoardWidth, sampleGame.CurrentPlayer);
-                sampleGame.CurrentPlayer = (sampleGame.CurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1;
+                SampleBoard.MarkCell(sampleRemainingMoves[j] % MoveBoard.Width, sampleRemainingMoves[j] / MoveBoard.Width, sampleCurrentPlayer);
+                sampleCurrentPlayer = (sampleCurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1;
             }
 
-            // This might need to stay to make it start with the same player at each iteration
-            sampleGame.CurrentPlayer = HexCell::PLAYER2;
-
-            if (sampleGame.IsGameWon()) 
+            if (SampleBoard.IsGameWon(HexCell::PLAYER2)) 
                 ++moveWinCount;
         }
 
         if (moveWinCount > maxWins) 
         {
             maxWins = moveWinCount;
-            move.first = RemainingMoves[i] % moveGame.BoardWidth;
-            move.second = RemainingMoves[i] / moveGame.BoardWidth;
+            move.first = RemainingMoves[i] % MoveBoard.Width;
+            move.second = RemainingMoves[i] / MoveBoard.Width;
         }        
     }
-
-    getmovetime = clock() - getmovetime;
-
-    std::cout << "getmovetime: " << (double) getmovetime / CLOCKS_PER_SEC << '\n' 
-              << "shuffletime: " << (double) shuffletime / CLOCKS_PER_SEC << '\n' 
-              << (double) shuffletime * 100 / getmovetime << "%\n\n";
 
     return move;
 }
