@@ -3,28 +3,31 @@
 
 #include <iostream>
 
-#include "hexcell.h"
-
 class HexBoard
 {
     public:
-        HexBoard(int width, int height, std::string p1Name = "P1", std::string p2Name = "P2");
+        HexBoard(int width, int height, char p1 = 'X', char p2 = 'O', std::string p1Name = "P1", std::string p2Name = "P2");
         ~HexBoard();        
-        HexCell GetCell(int x, int y) const;
-        bool MarkCell(int x, int y, HexCell player);
-        bool IsGameWon(HexCell player);
+        char GetCell(int x, int y) const;
+        bool MarkCell(int x, int y, char player);
+        bool IsGameWon(char player);
         friend bool CopyBoardState(HexBoard& dstBoard, HexBoard& srcBoard);
         friend std::ostream& operator<<(std::ostream& out, const HexBoard& HexBoard);
 
         const int Width;
         const int Height;
+        const char P1;
+        const char P2;
         const std::string P1Name;
         const std::string P2Name;
 
+        static const char EMPTY = '.';
+        static const char OUT_OF_BOUNDS = '_';
+
     private:                
-        HexCell** BoardState;
+        char** BoardState;
         bool **VisitedCells;        
-        bool TraversePathsFromCell(int x, int y, HexCell player);
+        bool TraversePathsFromCell(int x, int y, char player);
 };
 
 #endif

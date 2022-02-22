@@ -5,14 +5,13 @@
 #include <random>
 
 #include "hexboard.h"
-#include "hexcell.h"
 
 class AIPlayer
 {
     public:
         AIPlayer(int sampleCount, HexBoard& hexBoard);
         std::pair<int, int> GetMove();
-        void RemoveMove(std::pair<int, int>& move, HexCell player);        
+        void RemoveMove(std::pair<int, int>& move, char player);        
         friend void testAIPlayerConstructor();
         friend void testRemoveMove();
 

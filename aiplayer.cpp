@@ -5,15 +5,18 @@
 #include "hexboard.h"
 
 AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard) 
-    : SampleCount{sampleCount}, RandomEngine{time(nullptr)}, Board{hexBoard.Width, hexBoard.Height}, MoveBoard{hexBoard.Width, hexBoard.Height}, SampleBoard{hexBoard.Width, hexBoard.Height}
+    : SampleCount{sampleCount}, RandomEngine{time(nullptr)}, 
+    Board{hexBoard.Width, hexBoard.Height, hexBoard.P1, hexBoard.P2}, 
+    MoveBoard{hexBoard.Width, hexBoard.Height, hexBoard.P1, hexBoard.P2}, 
+    SampleBoard{hexBoard.Width, hexBoard.Height, hexBoard.P1, hexBoard.P2}
 {
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)
-            if (hexBoard.GetCell(col, row) == HexCell::EMPTY)
+            if (hexBoard.GetCell(col, row) == HexBoard::EMPTY)
                 RemainingMoves.push_back(row * hexBoard.Width + col); 
 }
 
-void AIPlayer::RemoveMove(std::pair<int, int>& move, HexCell player)
+void AIPlayer::RemoveMove(std::pair<int, int>& move, char player)
 {
     Board.MarkCell(move.first, move.second, player);
 
@@ -24,8 +27,8 @@ void AIPlayer::RemoveMove(std::pair<int, int>& move, HexCell player)
 std::pair<int, int> AIPlayer::GetMove()
 {
     std::pair<int, int> move;   
-    HexCell currentPlayer = HexCell::PLAYER2;
-    HexCell sampleCurrentPlayer;
+    char currentPlayer = Board.P2;
+    char sampleCurrentPlayer;
     int maxWins = 0;
 
     for (int i = 0; i < RemainingMoves.size(); ++i)
@@ -35,13 +38,13 @@ std::pair<int, int> AIPlayer::GetMove()
         int moveWinCount = 0; 
 
         CopyBoardState(MoveBoard, Board);
-        MoveBoard.MarkCell(sampleRemainingMoves.back() % MoveBoard.Width, sampleRemainingMoves.back() / MoveBoard.Width, currentPlayer);
+        MoveBoard.MarkCell(sampleRemainingMoves.back() % Board.Width, sampleRemainingMoves.back() / Board.Width, currentPlayer);
 
         sampleRemainingMoves.pop_back();
 
         for (int sample = 0; sample < SampleCount; ++sample)
         {   
-            sampleCurrentPlayer = (currentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1; // A (simulated move was played, so change current player);
+            sampleCurrentPlayer = (currentPlayer == Board.P1) ? Board.P2 : Board.P1; // A (simulated move was played, so change current player);
 
             CopyBoardState(SampleBoard, MoveBoard);    
 
@@ -49,11 +52,11 @@ std::pair<int, int> AIPlayer::GetMove()
 
             for (int j = 0; j < sampleRemainingMoves.size(); ++j)
             {
-                SampleBoard.MarkCell(sampleRemainingMoves[j] % MoveBoard.Width, sampleRemainingMoves[j] / MoveBoard.Width, sampleCurrentPlayer);
-                sampleCurrentPlayer = (sampleCurrentPlayer == HexCell::PLAYER1) ? HexCell::PLAYER2 : HexCell::PLAYER1;
+                SampleBoard.MarkCell(sampleRemainingMoves[j] % Board.Width, sampleRemainingMoves[j] / Board.Width, sampleCurrentPlayer);
+                sampleCurrentPlayer = (sampleCurrentPlayer == Board.P1) ? Board.P2 : Board.P1;
             }
 
-            if (SampleBoard.IsGameWon(HexCell::PLAYER2)) 
+            if (SampleBoard.IsGameWon(Board.P2)) 
                 ++moveWinCount;
         }
 

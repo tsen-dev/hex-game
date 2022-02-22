@@ -2,7 +2,6 @@
 #include <cassert>
 
 #include "hexboard.h"
-#include "hexcell.h"
 #include "aiplayer.h"
 #include "test.h"
 

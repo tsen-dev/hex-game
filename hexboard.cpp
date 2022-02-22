@@ -2,22 +2,21 @@
 #include <iomanip>
 
 #include "hexboard.h"
-#include "hexcell.h"
 
-HexBoard::HexBoard(int width, int height, std::string p1Name, std::string p2Name) 
-    : Width{width}, Height{height}, P1Name{p1Name}, P2Name{p2Name}
+HexBoard::HexBoard(int width, int height, char p1, char p2, std::string p1Name, std::string p2Name) 
+    : Width{width}, Height{height}, P1{p1}, P2{p2}, P1Name{p1Name}, P2Name{p2Name}
 {
-    BoardState = new HexCell* [Height];
+    BoardState = new char* [Height];
     VisitedCells = new bool* [Height];
 
     for (int row = 0; row < Height; ++row)
     {
-        BoardState[row] = new HexCell[Width];
+        BoardState[row] = new char[Width];
         VisitedCells[row] = new bool[Width];
 
         for (int col = 0; col < Width; ++col)
         {
-            BoardState[row][col] = HexCell::EMPTY;
+            BoardState[row][col] = HexBoard::EMPTY;
             VisitedCells[row][col] = false;
         }            
     }        
@@ -35,22 +34,22 @@ HexBoard::~HexBoard()
     delete[] VisitedCells;
 }
 
-HexCell HexBoard::GetCell(int x, int y) const
+char HexBoard::GetCell(int x, int y) const
 {
     if (x < 0 || x >= Width || y < 0 || y >= Height)    
-        return HexCell::NO_CELL;
+        return HexBoard::OUT_OF_BOUNDS;
     else
         return BoardState[y][x];        
 }
 
-bool HexBoard::MarkCell(int x, int y, HexCell player)
+bool HexBoard::MarkCell(int x, int y, char player)
 {
     switch (GetCell(x, y))
     {
-        case HexCell::EMPTY:
+        case HexBoard::EMPTY:
             BoardState[y][x] = player;
             return true;
-        case HexCell::NO_CELL:
+        case HexBoard::OUT_OF_BOUNDS:
             std::cerr << '(' << x << ',' << y << ") is out of bounds\n\n";
             return false;
         default:
@@ -59,13 +58,10 @@ bool HexBoard::MarkCell(int x, int y, HexCell player)
     }
 }
 
-bool HexBoard::TraversePathsFromCell(int x, int y, HexCell player)
+bool HexBoard::TraversePathsFromCell(int x, int y, char player)
 {
-    switch (player)
-    {
-        case HexCell::PLAYER1: if (x == Width - 1) return true; else break;
-        case HexCell::PLAYER2: if (y == Height - 1) return true; else break;
-    }
+    if (player == P1 && x == Width - 1) return true;
+    else if (player == P2 && y == Height - 1) return true;
 
     VisitedCells[y][x] = true;
 
@@ -90,11 +86,11 @@ bool HexBoard::TraversePathsFromCell(int x, int y, HexCell player)
     return false;
 }
 
-bool HexBoard::IsGameWon(HexCell player)
+bool HexBoard::IsGameWon(char player)
 {
-    int isGameWon = false;
+    bool isGameWon = false;
 
-    if (player == HexCell::PLAYER1)
+    if (player == P1)
     {
         for (int row = 0; row < Height; ++row)
             if (GetCell(0, row) == player && (isGameWon = TraversePathsFromCell(0, row, player)) == true)
@@ -125,11 +121,6 @@ bool CopyBoardState(HexBoard& dstBoard, HexBoard& srcBoard)
             dstBoard.BoardState[row][col] = srcBoard.BoardState[row][col];
 
     return true;
-}
-
-void PrintPlayer2Header()
-{
-    
 }
 
 inline int numberOfDigits(int n) {return (n == 0) ? 1 : floor(log10(n)) + 1;}
