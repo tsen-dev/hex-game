@@ -4,7 +4,8 @@
 #include "aiplayer.h"
 #include "hexboard.h"
 
-AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard) : SampleCount{sampleCount}, RandomEngine{static_cast<unsigned int>(time(nullptr))}, Board{hexBoard.Width, hexBoard.Height}, MoveBoard{hexBoard.Width, hexBoard.Height}, SampleBoard{hexBoard.Width, hexBoard.Height}
+AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard) 
+    : SampleCount{sampleCount}, RandomEngine{time(nullptr)}, Board{hexBoard.Width, hexBoard.Height}, MoveBoard{hexBoard.Width, hexBoard.Height}, SampleBoard{hexBoard.Width, hexBoard.Height}
 {
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)

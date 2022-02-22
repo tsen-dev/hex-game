@@ -4,7 +4,8 @@
 #include "hexboard.h"
 #include "hexcell.h"
 
-HexBoard::HexBoard(int width, int height) : Width{width}, Height{height}
+HexBoard::HexBoard(int width, int height, std::string p1Name, std::string p2Name) 
+    : Width{width}, Height{height}, P1Name{p1Name}, P2Name{p2Name}
 {
     BoardState = new HexCell* [Height];
     VisitedCells = new bool* [Height];
@@ -126,16 +127,21 @@ bool CopyBoardState(HexBoard& dstBoard, HexBoard& srcBoard)
     return true;
 }
 
+void PrintPlayer2Header()
+{
+    
+}
+
 inline int numberOfDigits(int n) {return (n == 0) ? 1 : floor(log10(n)) + 1;}
 
 std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
 {   
     int colHeaderWidth = numberOfDigits(hexboard.Width - 1);    
     int rowHeaderWidth = numberOfDigits(hexboard.Height - 1);    
-    int rowPadding = rowHeaderWidth + strlen("P1") + strlen(" ");
+    int rowPadding = rowHeaderWidth + hexboard.P1Name.size() + strlen(" ");
     
     // Print player 2's header
-    std::cout << std::setw(rowPadding + ((hexboard.Width - 1) * 4) / 2 - strlen("P2") / 2) << "" << "P2\n";
+    std::cout << std::setw(rowPadding + ((hexboard.Width - 1) * 4) / 2 - hexboard.P2Name.size() / 2) << "" << hexboard.P2Name << '\n';
 
     // Print top column headers
     for (int col = 0; col < hexboard.Width; ++col)
@@ -150,7 +156,7 @@ std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
     for (int row = 0; row < hexboard.Height; ++row)
     {
         if (row == hexboard.Height / 2) // Print player 1's header and left row header
-            std::cout << std::setw(rowPadding - rowHeaderWidth - strlen(" ")) << std::right << "P1" << ' ' << std::setw(rowHeaderWidth) << row << ' ';
+            std::cout << std::setw(rowPadding - rowHeaderWidth - strlen(" ")) << std::right << hexboard.P1Name << ' ' << std::setw(rowHeaderWidth) << row << ' ';
         else // Print left row header only
             std::cout << std::setw(rowPadding) << std::right << row << ' ';
         
