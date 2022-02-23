@@ -126,7 +126,7 @@ bool HexBoard::HasPlayerWon(char player)
             isGameWon = true;
             break;
         }                    
-        player == P1 ? ++col : ++row;
+        player == P1 ? ++row : ++col;
     }
 
     for (int row = 0; row < Height; ++row)

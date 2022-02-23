@@ -16,8 +16,11 @@ class AIPlayer
         friend void testRemoveMove();
 
     private:
+        int SampleMove(int moveIndex);
+
         int SampleCount;
         std::vector<int> RemainingMoves;        
+        std::vector<int> ShuffledRemainingMoves;        
         HexBoard Board, MoveBoard, SampleBoard;
         std::default_random_engine RandomEngine;
 };

@@ -26,8 +26,9 @@ void startGame()
 
         else 
         {
+            std::cout << hexBoard.P2Name << (tolower(hexBoard.P2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                            
             if (settings.SinglePlayer == true) move = aiPlayer.GetMove();
-            else std::cout << hexBoard.P2Name << (tolower(hexBoard.P2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                
+            else std::cin >> move.first >> move.second;             
         }
         
         while (hexBoard.MarkCell(move.first, move.second, currentPlayer) == false) 
