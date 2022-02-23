@@ -3,10 +3,13 @@
 
 #include <iostream>
 
+#include "settings.h"
+
 class HexBoard
 {
     public:
         HexBoard(int width, int height, char p1 = 'X', char p2 = 'O', std::string p1Name = "P1", std::string p2Name = "P2");
+        HexBoard(Settings& settings);
         ~HexBoard();        
         char GetCell(int x, int y) const;
         bool MarkCell(int x, int y, char player);
@@ -27,6 +30,8 @@ class HexBoard
     private:                
         char** BoardState;
         bool **VisitedCells;        
+        void InitialiseVisitedCells();
+        void InitialiseBoardState();
         bool TraversePathsFromCell(int x, int y, char player);
 };
 

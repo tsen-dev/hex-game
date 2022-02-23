@@ -3,23 +3,50 @@
 
 #include "hexboard.h"
 
-HexBoard::HexBoard(int width, int height, char p1, char p2, std::string p1Name, std::string p2Name) 
-    : Width{width}, Height{height}, P1{p1}, P2{p2}, P1Name{p1Name}, P2Name{p2Name}
+void HexBoard::InitialiseBoardState()
 {
     BoardState = new char* [Height];
-    VisitedCells = new bool* [Height];
 
     for (int row = 0; row < Height; ++row)
     {
         BoardState[row] = new char[Width];
-        VisitedCells[row] = new bool[Width];
 
         for (int col = 0; col < Width; ++col)
         {
             BoardState[row][col] = HexBoard::EMPTY;
+        }            
+    }
+}
+
+void HexBoard::InitialiseVisitedCells()
+{
+    VisitedCells = new bool* [Height];
+
+    for (int row = 0; row < Height; ++row)
+    {
+        VisitedCells[row] = new bool[Width];
+
+        for (int col = 0; col < Width; ++col)
+        {
             VisitedCells[row][col] = false;
         }            
     }        
+}
+
+HexBoard::HexBoard(int width, int height, char p1, char p2, std::string p1Name, std::string p2Name) 
+    : Width{width}, Height{height}, P1{p1}, P2{p2}, P1Name{p1Name}, P2Name{p2Name}
+{
+    InitialiseBoardState();
+    InitialiseVisitedCells();
+}
+
+HexBoard::HexBoard(Settings& settings) :
+    Width{settings.BoardSize.first}, Height{settings.BoardSize.second}, 
+    P1{settings.PlayerMarkers.first}, P2{settings.PlayerMarkers.second}, 
+    P1Name{settings.PlayerNames.first}, P2Name{settings.PlayerNames.second}
+{
+    InitialiseBoardState();
+    InitialiseVisitedCells();    
 }
 
 HexBoard::~HexBoard()

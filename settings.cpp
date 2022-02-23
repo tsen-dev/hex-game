@@ -20,6 +20,8 @@ void Settings::GetBoardSize()
         std::cout << "Enter the size (width and height) of the hex board (e.g. 7 7):\n\n";
         std::cin >> BoardSize.first >> BoardSize.second;
     }
+
+    std::cout << '\n';
 }
 
 void Settings::GetPlayerMode()
@@ -33,6 +35,8 @@ void Settings::GetPlayerMode()
     }
 
     SinglePlayer = (response == 'Y');
+
+    std::cout << '\n';
 }
 
 void Settings::GetPlayerMarkers()
@@ -46,7 +50,7 @@ void Settings::GetPlayerMarkers()
         std::cin >> PlayerMarkers.first;
     }
 
-    std::cout << "Enter player 2's marker:\n\n";
+    std::cout << "\nEnter player 2's marker:\n\n";
     std::cin >> PlayerMarkers.second;
 
     while (PlayerMarkers.second == HexBoard::EMPTY || PlayerMarkers.second == HexBoard::OUT_OF_BOUNDS || PlayerMarkers.second == PlayerMarkers.first)
@@ -54,6 +58,8 @@ void Settings::GetPlayerMarkers()
         std::cout << HexBoard::EMPTY << " (empty cell) or " << PlayerMarkers.first << " (player 1) can't be used\n\n";
         std::cin >> PlayerMarkers.second;
     }
+
+    std::cout << '\n';
 }
 
 void Settings::GetPlayerNames()
@@ -66,7 +72,9 @@ void Settings::GetPlayerNames()
 
     else
     {
-        std::cout << "Enter player 2's name:\n\n";
+        std::cout << "\nEnter player 2's name:\n\n";
         std::cin >> PlayerNames.second;
     }    
+
+    std::cout << '\n';
 }
