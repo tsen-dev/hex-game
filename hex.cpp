@@ -10,9 +10,9 @@ void startGame()
 {
     Settings settings{};
     HexBoard hexBoard{settings};
-    AIPlayer aiPlayer{1000, hexBoard};
-    char currentPlayer = hexBoard.P1;
+    AIPlayer aiPlayer{1000, hexBoard};    
     std::pair<int, int> move;
+    char currentPlayer = hexBoard.P1;
     
     while (true)
     {
@@ -26,8 +26,8 @@ void startGame()
 
         else 
         {
-            std::cout << hexBoard.P2Name << (tolower(hexBoard.P2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";         
-            move = aiPlayer.GetMove();
+            if (settings.SinglePlayer == true) move = aiPlayer.GetMove();
+            else std::cout << hexBoard.P2Name << (tolower(hexBoard.P2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                
         }
         
         while (hexBoard.MarkCell(move.first, move.second, currentPlayer) == false) 
