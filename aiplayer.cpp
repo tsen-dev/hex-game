@@ -56,7 +56,7 @@ std::pair<int, int> AIPlayer::GetMove()
                 sampleCurrentPlayer = (sampleCurrentPlayer == Board.P1) ? Board.P2 : Board.P1;
             }
 
-            if (SampleBoard.IsGameWon(Board.P2)) 
+            if (SampleBoard.HasPlayerWon(Board.P2)) 
                 ++moveWinCount;
         }
 

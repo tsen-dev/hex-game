@@ -35,7 +35,7 @@ void startGame()
 
         aiPlayer.RemoveMove(move, currentPlayer);
 
-        if (hexBoard.IsGameWon(currentPlayer) == true) break;
+        if (hexBoard.HasPlayerWon(currentPlayer) == true) break;
         else currentPlayer = (currentPlayer == hexBoard.P1) ? hexBoard.P2 : hexBoard.P1; 
     }
 

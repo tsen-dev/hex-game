@@ -89,11 +89,11 @@ void testGameWonByPlayer1()
     for (int col = 0; col < board1Width - 1; ++col)
     {
         hexBoard1.MarkCell(col, 0, hexBoard1.P1);
-        assert(hexBoard1.IsGameWon(hexBoard1.P1) == false);
+        assert(hexBoard1.HasPlayerWon(hexBoard1.P1) == false);
     }    
 
     hexBoard1.MarkCell(board1Width - 1, 0, hexBoard1.P1);
-    assert(hexBoard1.IsGameWon(hexBoard1.P1) == true);    
+    assert(hexBoard1.HasPlayerWon(hexBoard1.P1) == true);    
 
     /* 
     Player 1 marks *connected* a diagonal path:
@@ -116,11 +116,11 @@ void testGameWonByPlayer1()
     {
         hexBoard2.MarkCell(col, col, hexBoard2.P1);
         hexBoard2.MarkCell(col, col + 1, hexBoard2.P1);
-        assert(hexBoard2.IsGameWon(hexBoard2.P1) == false);
+        assert(hexBoard2.HasPlayerWon(hexBoard2.P1) == false);
     }
 
     hexBoard2.MarkCell(board2Width - 1, board2Width - 1, hexBoard2.P1);
-    assert(hexBoard2.IsGameWon(hexBoard2.P1) == true);
+    assert(hexBoard2.HasPlayerWon(hexBoard2.P1) == true);
 
     /*
     Player 1 marks a complex path with branching and reversing:
@@ -145,16 +145,16 @@ void testGameWonByPlayer1()
     HexBoard hexBoard3{board3Width, board3Width};
 
     for (int row = 0; row < board3Width; ++row) hexBoard3.MarkCell(0, row, hexBoard3.P1);
-    assert(hexBoard3.IsGameWon(hexBoard3.P1) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P1) == false);
     for (int col = 1; col < 5; ++col) hexBoard3.MarkCell(col, 1, hexBoard3.P1);
-    assert(hexBoard3.IsGameWon(hexBoard3.P1) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P1) == false);
     for (int row = 2; row < 4; ++row) hexBoard3.MarkCell(4, row, hexBoard3.P1);
-    assert(hexBoard3.IsGameWon(hexBoard3.P1) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P1) == false);
     hexBoard3.MarkCell(3, 4, hexBoard3.P1);
     hexBoard3.MarkCell(2, 5, hexBoard3.P1);
-    assert(hexBoard3.IsGameWon(hexBoard3.P1) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P1) == false);
     for (int col = 2; col < board3Width; ++col) hexBoard3.MarkCell(col, board3Width - 1, hexBoard3.P1);
-    assert(hexBoard3.IsGameWon(hexBoard3.P1) == true);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P1) == true);
 
     /* 
     Player 1 marks a disconnected diagonal path:
@@ -176,7 +176,7 @@ void testGameWonByPlayer1()
     for (int col = 0; col < board4Width; ++col)
     {
         hexBoard4.MarkCell(col, col, hexBoard4.P1);
-        assert(hexBoard4.IsGameWon(hexBoard4.P1) == false);
+        assert(hexBoard4.HasPlayerWon(hexBoard4.P1) == false);
     }
 }
 
@@ -193,11 +193,11 @@ void testGameWonByPlayer2()
     for (int row = 0; row < board1Height - 1; ++row)
     {
         hexBoard1.MarkCell(0, row, hexBoard1.P2);
-        assert(hexBoard1.IsGameWon(hexBoard1.P2) == false);
+        assert(hexBoard1.HasPlayerWon(hexBoard1.P2) == false);
     }    
 
     hexBoard1.MarkCell(0, board1Height - 1, hexBoard1.P2);
-    assert(hexBoard1.IsGameWon(hexBoard1.P2) == true);
+    assert(hexBoard1.HasPlayerWon(hexBoard1.P2) == true);
 
     /* 
     Player 2 marks *connected* a diagonal path:
@@ -220,11 +220,11 @@ void testGameWonByPlayer2()
     {
         hexBoard2.MarkCell(row, row, hexBoard2.P2);
         hexBoard2.MarkCell(row + 1, row, hexBoard2.P2);
-        assert(hexBoard2.IsGameWon(hexBoard2.P2) == false);
+        assert(hexBoard2.HasPlayerWon(hexBoard2.P2) == false);
     }
 
     hexBoard2.MarkCell(board2Height - 1, board2Height - 1, hexBoard2.P2);
-    assert(hexBoard2.IsGameWon(hexBoard2.P2) == true);
+    assert(hexBoard2.HasPlayerWon(hexBoard2.P2) == true);
 
     /*
     Player 2 marks a complex path with branching and reversing:
@@ -249,16 +249,16 @@ void testGameWonByPlayer2()
     HexBoard hexBoard3{board3Height, board3Height};
 
     for (int col = 0; col < board3Height; ++col) hexBoard3.MarkCell(col, 0, hexBoard3.P2);
-    assert(hexBoard3.IsGameWon(hexBoard3.P2) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P2) == false);
     for (int row = 1; row < 5; ++row) hexBoard3.MarkCell(1, row, hexBoard3.P2);
-    assert(hexBoard3.IsGameWon(hexBoard3.P2) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P2) == false);
     for (int col = 2; col < 4; ++col) hexBoard3.MarkCell(col, 4, hexBoard3.P2);
-    assert(hexBoard3.IsGameWon(hexBoard3.P2) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P2) == false);
     hexBoard3.MarkCell(4, 3, hexBoard3.P2);
     hexBoard3.MarkCell(5, 2, hexBoard3.P2);
-    assert(hexBoard3.IsGameWon(hexBoard3.P2) == false);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P2) == false);
     for (int row = 2; row < board3Height; ++row) hexBoard3.MarkCell(board3Height - 1, row, hexBoard3.P2);
-    assert(hexBoard3.IsGameWon(hexBoard3.P2) == true);
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P2) == true);
 
     /* 
     Player 2 marks a disconnected diagonal path:
@@ -280,7 +280,7 @@ void testGameWonByPlayer2()
     for (int row = 0; row < board4Height; ++row)
     {
         hexBoard4.MarkCell(row, row, hexBoard4.P2);
-        assert(hexBoard4.IsGameWon(hexBoard4.P2) == false);
+        assert(hexBoard4.HasPlayerWon(hexBoard4.P2) == false);
     }
 }
 

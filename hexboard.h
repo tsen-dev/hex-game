@@ -13,7 +13,7 @@ class HexBoard
         ~HexBoard();        
         char GetCell(int x, int y) const;
         bool MarkCell(int x, int y, char player);
-        bool IsGameWon(char player);
+        bool HasPlayerWon(char player);
         friend bool CopyBoardState(HexBoard& dstBoard, HexBoard& srcBoard);
         friend std::ostream& operator<<(std::ostream& out, const HexBoard& HexBoard);
 

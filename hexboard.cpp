@@ -113,22 +113,20 @@ bool HexBoard::TraversePathsFromCell(int x, int y, char player)
     return false;
 }
 
-bool HexBoard::IsGameWon(char player)
+bool HexBoard::HasPlayerWon(char player)
 {
     bool isGameWon = false;
+    int row = 0, col = 0;
+    int end = (player == P1 ? Height : Width);
 
-    if (player == P1)
+    for (int i = 0; i < end; ++i)
     {
-        for (int row = 0; row < Height; ++row)
-            if (GetCell(0, row) == player && (isGameWon = TraversePathsFromCell(0, row, player)) == true)
-                break;
-    }
-
-    else
-    {
-        for (int col = 0; col < Width; ++col)
-            if (GetCell(col, 0) == player && (isGameWon = TraversePathsFromCell(col, 0, player)) == true)
-                break;
+        if (GetCell(col, row) == player && TraversePathsFromCell(col, row, player) == true)
+        {
+            isGameWon = true;
+            break;
+        }                    
+        player == P1 ? ++col : ++row;
     }
 
     for (int row = 0; row < Height; ++row)
