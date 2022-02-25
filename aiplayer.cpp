@@ -1,15 +1,13 @@
 #include <random>
-#include <array>
-#include <algorithm>
+#include <numeric>
+#include <thread>
 
 #include "aiplayer.h"
 #include "hexboard.h"
 
-AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard) 
-    : SampleCount{sampleCount}, RandomEngine{time(nullptr)}, 
-    Board{hexBoard.Width, hexBoard.Height, hexBoard.P1, hexBoard.P2}, 
-    MoveBoard{hexBoard.Width, hexBoard.Height, hexBoard.P1, hexBoard.P2}, 
-    SampleBoard{hexBoard.Width, hexBoard.Height, hexBoard.P1, hexBoard.P2}
+AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard, int threads) : 
+    SampleCount{sampleCount}, 
+    Board{hexBoard}, MoveBoard{hexBoard}, SampleBoards{THREAD_COUNT, HexBoard{hexBoard}}
 {
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)
@@ -23,41 +21,52 @@ void AIPlayer::RemoveMove(std::pair<int, int>& move, char player)
     RemainingMoves.erase(std::find(RemainingMoves.begin(), RemainingMoves.end(), move.second * Board.Width + move.first));
 }
 
-int AIPlayer::SampleMove(int moveIndex)
+void AIPlayer::TryMove(int thread, int moveIndex, std::vector<int>& winCounts)
 {
-    int winCount = 0;
-    char currentPlayer = Board.P2;
+    ShuffledRemainingMoves[thread] = RemainingMoves;
+    std::swap(ShuffledRemainingMoves[thread][moveIndex], ShuffledRemainingMoves[thread][ShuffledRemainingMoves[thread].size() - 1]);                    
+    ShuffledRemainingMoves[thread].pop_back();
+    int samples = (SampleCount / THREAD_COUNT) + (thread == THREAD_COUNT - 1 ? SampleCount % THREAD_COUNT : 0); 
+    char currentPlayer;
+    std::default_random_engine rng{static_cast<unsigned int>(time(nullptr))};
 
-    CopyBoardState(MoveBoard, Board);
-    ShuffledRemainingMoves = RemainingMoves;
-
-    std::swap(ShuffledRemainingMoves[moveIndex], ShuffledRemainingMoves[ShuffledRemainingMoves.size() - 1]);                    
-    MoveBoard.MarkCell(ShuffledRemainingMoves.back() % Board.Width, ShuffledRemainingMoves.back() / Board.Width, currentPlayer);
-    ShuffledRemainingMoves.pop_back();
-
-    for (int sample = 0; sample < SampleCount; ++sample)
+    for (int sample = 0; sample < samples; ++sample)
     {
         currentPlayer = Board.P1;
-        CopyBoardState(SampleBoard, MoveBoard);  
-        std::shuffle(ShuffledRemainingMoves.begin(), ShuffledRemainingMoves.end(), RandomEngine);  
-
-        for (int moveIndex = 0; moveIndex < ShuffledRemainingMoves.size(); ++moveIndex)
+        CopyBoardState(SampleBoards[thread], MoveBoard);  
+        std::shuffle(ShuffledRemainingMoves[thread].begin(), ShuffledRemainingMoves[thread].end(), rng);  
+        for (int moveIndex = 0; moveIndex < ShuffledRemainingMoves[thread].size(); ++moveIndex)
         {
-            SampleBoard.MarkCell(ShuffledRemainingMoves[moveIndex] % Board.Width, ShuffledRemainingMoves[moveIndex] / Board.Width, currentPlayer);
+            SampleBoards[thread].MarkCell(ShuffledRemainingMoves[thread][moveIndex] % Board.Width, ShuffledRemainingMoves[thread][moveIndex] / Board.Width, currentPlayer);
             currentPlayer = (currentPlayer == Board.P1) ? Board.P2 : Board.P1;
         }
-
-        if (SampleBoard.HasPlayerWon(SampleBoard.P2) == true)
-            ++winCount;
+        if (SampleBoards[thread].HasPlayerWon(SampleBoards[thread].P2) == true)
+            ++winCounts[thread];
     }
+}
 
-    return winCount;
+int AIPlayer::SampleMove(int moveIndex)
+{
+    std::vector<int> winCounts(THREAD_COUNT, 0);        
+    char currentPlayer = Board.P2;
+    std::vector<std::thread> threads;
+
+    CopyBoardState(MoveBoard, Board);
+    MoveBoard.MarkCell(RemainingMoves[moveIndex] % Board.Width, RemainingMoves[moveIndex] / Board.Width, currentPlayer);
+
+    for (int thread = 0; thread < THREAD_COUNT; ++thread)
+        threads.push_back(std::thread{&AIPlayer::TryMove, this, thread, moveIndex, std::ref(winCounts)});
+
+    for (int thread = 0; thread < THREAD_COUNT; ++thread)
+        threads[thread].join();
+
+    return accumulate(winCounts.begin(), winCounts.end(), 0);
 }
 
 std::pair<int, int> AIPlayer::GetMove()
 {
     clock_t time = clock();
-    std::pair<int, int> move;   
+    std::pair<int, int> bestMove;   
     char currentPlayer = Board.P2;
     int maxWins = 0;    
     int moveWinCount;
@@ -67,12 +76,12 @@ std::pair<int, int> AIPlayer::GetMove()
         if ((moveWinCount = SampleMove(moveIndex)) > maxWins) 
         {
             maxWins = moveWinCount;
-            move.first = RemainingMoves[moveIndex] % MoveBoard.Width;
-            move.second = RemainingMoves[moveIndex] / MoveBoard.Width;
+            bestMove.first = RemainingMoves[moveIndex] % MoveBoard.Width;
+            bestMove.second = RemainingMoves[moveIndex] / MoveBoard.Width;
         }        
     }
 
     std::cout << (double) (clock() - time) / CLOCKS_PER_SEC;
 
-    return move;
+    return bestMove;
 }

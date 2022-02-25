@@ -40,6 +40,16 @@ HexBoard::HexBoard(int width, int height, char p1, char p2, std::string p1Name, 
     InitialiseVisitedCells();
 }
 
+HexBoard::HexBoard(const HexBoard& hexBoard) : 
+    Width{hexBoard.Width}, Height{hexBoard.Height}, 
+    P1{hexBoard.P1}, P2{hexBoard.P2},
+    P1Name{hexBoard.P1Name}, P2Name{hexBoard.P2Name}
+{
+    InitialiseBoardState();
+    InitialiseVisitedCells();
+    CopyBoardState(*this, hexBoard);    
+}
+
 HexBoard::HexBoard(Settings& settings) :
     Width{settings.BoardSize.first}, Height{settings.BoardSize.second}, 
     P1{settings.PlayerMarkers.first}, P2{settings.PlayerMarkers.second}, 
@@ -136,7 +146,7 @@ bool HexBoard::HasPlayerWon(char player)
     return isGameWon;
 }
 
-bool CopyBoardState(HexBoard& dstBoard, HexBoard& srcBoard)
+bool CopyBoardState(HexBoard& dstBoard, const HexBoard& srcBoard)
 {
     if (dstBoard.Width != srcBoard.Width || dstBoard.Height != srcBoard.Height)
         return false;
