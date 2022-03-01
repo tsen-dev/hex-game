@@ -10,7 +10,7 @@ void startGame()
 {
     Settings settings{};
     HexBoard hexBoard{settings};
-    AIPlayer aiPlayer{1000, hexBoard};    
+    AIPlayer aiPlayer{hexBoard, 1000, 4};    
     std::pair<int, int> move;
     char currentPlayer = hexBoard.P1;
     

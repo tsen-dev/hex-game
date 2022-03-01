@@ -339,7 +339,7 @@ void testAIPlayerConstructor()
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
         hexBoard.MarkCell(i, i, hexBoard.P1); 
 
-    AIPlayer aiPlayer{1000, hexBoard};
+    AIPlayer aiPlayer{hexBoard};
 
     // Check that:
     // (1) all unoccupied cells are available to aiPlayer as a move, and no occupied cells are
@@ -365,7 +365,7 @@ void testRemoveMove()
     int board1Height = 5;
 
     HexBoard hexBoard{board1Width, board1Height};
-    AIPlayer aiPlayer{1000, hexBoard};
+    AIPlayer aiPlayer{hexBoard};
 
     // Check that:
     // (1) Each played move is removed from aiPlayer's list of available moves

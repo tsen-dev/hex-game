@@ -5,10 +5,12 @@
 #include "aiplayer.h"
 #include "hexboard.h"
 
-AIPlayer::AIPlayer(int sampleCount, HexBoard& hexBoard, int threads) : 
-    SampleCount{sampleCount}, 
-    Board{hexBoard}, MoveBoard{hexBoard}, SampleBoards{THREAD_COUNT, HexBoard{hexBoard}}
+AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) : 
+    SampleCount{sampleCount}, SamplerCount{samplerCount}, ShuffledRemainingMoves{samplerCount},
+    Board{hexBoard}, MoveBoard{hexBoard}, SampleBoards{samplerCount, HexBoard{hexBoard}}, RandomEngines{SamplerCount}
 {
+    RemainingMoves.reserve(Board.Width * Board.Height);
+
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)
             if (hexBoard.GetCell(col, row) == HexBoard::EMPTY)
@@ -26,15 +28,15 @@ void AIPlayer::TryMove(int thread, int moveIndex, std::vector<int>& winCounts)
     ShuffledRemainingMoves[thread] = RemainingMoves;
     std::swap(ShuffledRemainingMoves[thread][moveIndex], ShuffledRemainingMoves[thread][ShuffledRemainingMoves[thread].size() - 1]);                    
     ShuffledRemainingMoves[thread].pop_back();
-    int samples = (SampleCount / THREAD_COUNT) + (thread == THREAD_COUNT - 1 ? SampleCount % THREAD_COUNT : 0); 
+    int samples = (SampleCount / SamplerCount) + (thread == SamplerCount - 1 ? SampleCount % SamplerCount : 0); 
     char currentPlayer;
-    std::default_random_engine rng{static_cast<unsigned int>(time(nullptr))};
+    RandomEngines[thread].seed(time(nullptr) + thread);
 
     for (int sample = 0; sample < samples; ++sample)
     {
         currentPlayer = Board.P1;
         CopyBoardState(SampleBoards[thread], MoveBoard);  
-        std::shuffle(ShuffledRemainingMoves[thread].begin(), ShuffledRemainingMoves[thread].end(), rng);  
+        std::shuffle(ShuffledRemainingMoves[thread].begin(), ShuffledRemainingMoves[thread].end(), RandomEngines[thread]);  
         for (int moveIndex = 0; moveIndex < ShuffledRemainingMoves[thread].size(); ++moveIndex)
         {
             SampleBoards[thread].MarkCell(ShuffledRemainingMoves[thread][moveIndex] % Board.Width, ShuffledRemainingMoves[thread][moveIndex] / Board.Width, currentPlayer);
@@ -47,17 +49,17 @@ void AIPlayer::TryMove(int thread, int moveIndex, std::vector<int>& winCounts)
 
 int AIPlayer::SampleMove(int moveIndex)
 {
-    std::vector<int> winCounts(THREAD_COUNT, 0);        
+    std::vector<int> winCounts(SamplerCount, 0);        
     char currentPlayer = Board.P2;
     std::vector<std::thread> threads;
 
     CopyBoardState(MoveBoard, Board);
     MoveBoard.MarkCell(RemainingMoves[moveIndex] % Board.Width, RemainingMoves[moveIndex] / Board.Width, currentPlayer);
 
-    for (int thread = 0; thread < THREAD_COUNT; ++thread)
+    for (int thread = 0; thread < SamplerCount; ++thread)
         threads.push_back(std::thread{&AIPlayer::TryMove, this, thread, moveIndex, std::ref(winCounts)});
 
-    for (int thread = 0; thread < THREAD_COUNT; ++thread)
+    for (int thread = 0; thread < SamplerCount; ++thread)
         threads[thread].join();
 
     return accumulate(winCounts.begin(), winCounts.end(), 0);

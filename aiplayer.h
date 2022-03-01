@@ -9,7 +9,7 @@
 class AIPlayer
 {
     public:
-        AIPlayer(int sampleCount, HexBoard& hexBoard, int threads = 8);
+        AIPlayer(HexBoard& hexBoard, int sampleCount = 1000, int samplerCount = 8);
         std::pair<int, int> GetMove();
         void RemoveMove(std::pair<int, int>& move, char player);        
         friend void testAIPlayerConstructor();
@@ -20,11 +20,12 @@ class AIPlayer
         void TryMove(int thread, int moveIndex, std::vector<int>& winCounts);
 
         int SampleCount;
-        static const int THREAD_COUNT = 8;
+        int SamplerCount;
         std::vector<int> RemainingMoves;        
-        std::vector<int> ShuffledRemainingMoves[THREAD_COUNT];        
+        std::vector<std::vector<int>> ShuffledRemainingMoves;        
         HexBoard Board, MoveBoard;
         std::vector<HexBoard> SampleBoards;
+        std::vector<std::default_random_engine> RandomEngines;
 };
 
 #endif
