@@ -5,6 +5,7 @@
 #include <random>
 
 #include "hexboard.h"
+#include "sampler.h"
 
 class AIPlayer
 {
@@ -16,16 +17,12 @@ class AIPlayer
         friend void testRemoveMove();
 
     private:
-        int SampleMove(int moveIndex);
-        void TryMove(int thread, int moveIndex, std::vector<int>& winCounts);
+        int SampleMove(int move);
 
         int SampleCount;
-        int SamplerCount;
-        std::vector<int> RemainingMoves;        
-        std::vector<std::vector<int>> ShuffledRemainingMoves;        
+        std::vector<int> Moves;        
         HexBoard Board, MoveBoard;
-        std::vector<HexBoard> SampleBoards;
-        std::vector<std::default_random_engine> RandomEngines;
+        std::vector<Sampler> Samplers;
 };
 
 #endif

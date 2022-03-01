@@ -349,12 +349,12 @@ void testAIPlayerConstructor()
     {
         for (int col = 0; col < hexBoard.Width; ++col)
         {
-            auto move = std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * hexBoard.Width + col);
-            bool moveFound = move != aiPlayer.RemainingMoves.end();
+            auto move = std::find(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), row * hexBoard.Width + col);
+            bool moveFound = move != aiPlayer.Moves.end();
             if (hexBoard.GetCell(col, row) == HexBoard::EMPTY) 
                 assert(col == *move % hexBoard.Width && row == *move / hexBoard.Width);
             else 
-                assert(move == aiPlayer.RemainingMoves.end());
+                assert(move == aiPlayer.Moves.end());
         }
     }
 }
@@ -386,8 +386,8 @@ void testRemoveMove()
         for (int col = 0; col < hexBoard.Width; ++col)
         {
             bool moveFound = 
-                std::find(aiPlayer.RemainingMoves.begin(), aiPlayer.RemainingMoves.end(), row * hexBoard.Width + col) 
-                != aiPlayer.RemainingMoves.end();
+                std::find(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), row * hexBoard.Width + col) 
+                != aiPlayer.Moves.end();
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
             assert(hexBoard.GetCell(col, row) == aiPlayer.Board.GetCell(col, row));
         }            
