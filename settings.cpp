@@ -1,4 +1,5 @@
 #include <iostream>
+#include <string>
 
 #include "settings.h"
 #include "hexboard.h"
@@ -89,14 +90,15 @@ void Settings::GetPlayerMarkers()
         std::cout << HexBoard::EMPTY << " (empty cell) or " << PlayerMarkers.first << " (player 1) can't be used\n\n";
         std::cin >> PlayerMarkers.second;
     }
-
+    
+    std::getline(std::cin, std::string{}); // Consume newline in std::cin   
     std::cout << '\n';
 }
 
 void Settings::GetPlayerNames()
 {
     std::cout << "Enter player 1's name:\n\n";
-    std::cin >> PlayerNames.first;
+    std::getline(std::cin, PlayerNames.first);
 
     if (SinglePlayer == true)
         PlayerNames.second = "CPU";
@@ -104,7 +106,7 @@ void Settings::GetPlayerNames()
     else
     {
         std::cout << "\nEnter player 2's name:\n\n";
-        std::cin >> PlayerNames.second;
+        std::getline(std::cin, PlayerNames.first);
     }    
 
     std::cout << '\n';

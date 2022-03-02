@@ -12,6 +12,7 @@ void startGame()
     HexBoard hexBoard{settings};
     AIPlayer aiPlayer{hexBoard, settings.AIDifficulty, settings.AIThreadCount};    
     std::pair<int, int> move;
+    // bool firstMove = true;
     char currentPlayer = hexBoard.P1;
     
     while (true)
@@ -26,9 +27,14 @@ void startGame()
 
         else 
         {
+            // if (firstMove)
+            // {
+            //     std::cout << "Steal last move? (Y/N):"
+            // }
             std::cout << hexBoard.P2Name << (tolower(hexBoard.P2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                            
             if (settings.SinglePlayer == true) move = aiPlayer.GetMove();
             else std::cin >> move.first >> move.second;             
+            // firstMove = false;
         }
         
         while (hexBoard.MarkCell(move.first, move.second, currentPlayer) == false) 
