@@ -7,6 +7,11 @@ Settings::Settings()
 {
     GetBoardSize();
     GetPlayerMode();
+    if (SinglePlayer == true) 
+    {
+        GetAIDifficulty();
+        GetAIThreadCount();
+    }    
     GetPlayerMarkers();
     GetPlayerNames();
 }
@@ -36,6 +41,32 @@ void Settings::GetPlayerMode()
 
     SinglePlayer = (response == 'Y');
 
+    std::cout << '\n';
+}
+
+void Settings::GetAIDifficulty()
+{
+    AIDifficulty = -1;
+
+    while (AIDifficulty < 0)
+    {
+        std::cout << "Enter AI difficulty: 0 (easy) --- 100 (medium) --- 1000+ (hard)\n\n";
+        std::cin >> AIDifficulty;
+    }
+    
+    std::cout << '\n';
+}
+
+void Settings::GetAIThreadCount()
+{
+    AIThreadCount = -1;
+
+    while (AIThreadCount < 0)
+    {
+        std::cout << "Enter number of AI threads (recommended 8):\n\n";
+        std::cin >> AIThreadCount;
+    }
+    
     std::cout << '\n';
 }
 

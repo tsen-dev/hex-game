@@ -9,12 +9,16 @@ struct Settings
         std::pair<char, char> PlayerMarkers;
         std::pair<std::string, std::string> PlayerNames;        
         bool SinglePlayer;
+        int AIDifficulty;
+        int AIThreadCount;
 
     private:
         void GetBoardSize();
         void GetPlayerMarkers();
         void GetPlayerNames();
         void GetPlayerMode();
+        void GetAIDifficulty();
+        void GetAIThreadCount();
 };
 
 #endif
