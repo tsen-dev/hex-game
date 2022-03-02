@@ -11,18 +11,33 @@ int Sampler::SampleMove(int move, int sampleCount)
     moveIndices.pop_back();
 
     char currentPlayer;
+    bool reverseUsed = true;
     int wins = 0;
 
     for (int sample = 0; sample < sampleCount; ++sample)
     {
         currentPlayer = MoveBoard.P1;        
         CopyBoardState(SampleBoard, MoveBoard);  
-        std::shuffle(moveIndices.begin(), moveIndices.end(), RandomEngine);  
 
-        for (int move = 0; move < moveIndices.size(); ++move)
+        if (reverseUsed == true)
         {
-            SampleBoard.MarkCell(Moves[moveIndices[move]].first, Moves[moveIndices[move]].second, currentPlayer);
-            currentPlayer = (currentPlayer == MoveBoard.P1) ? MoveBoard.P2 : MoveBoard.P1;
+            std::shuffle(moveIndices.begin(), moveIndices.end(), RandomEngine);              
+            for (int move = 0; move < moveIndices.size(); ++move)
+            {
+                SampleBoard.MarkCell(Moves[moveIndices[move]].first, Moves[moveIndices[move]].second, currentPlayer);
+                currentPlayer = (currentPlayer == MoveBoard.P1) ? MoveBoard.P2 : MoveBoard.P1;
+            }            
+            reverseUsed = false;
+        }
+
+        else
+        {
+            for (int move = moveIndices.size() - 1; move >= 0; --move)
+            {
+                SampleBoard.MarkCell(Moves[moveIndices[move]].first, Moves[moveIndices[move]].second, currentPlayer);
+                currentPlayer = (currentPlayer == MoveBoard.P1) ? MoveBoard.P2 : MoveBoard.P1;
+            }            
+            reverseUsed = true;
         }
 
         if (SampleBoard.HasPlayerWon(SampleBoard.P2) == true)

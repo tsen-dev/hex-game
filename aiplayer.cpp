@@ -36,7 +36,6 @@ int AIPlayer::SampleMove(int move)
     CopyBoardState(MoveBoard, Board);
     MoveBoard.MarkCell(Moves[move].first, Moves[move].second, Board.P2);
 
-    // Remove move from remaining moves here instead of doing it in each Sampler's SampleMove
     for (int sampler = 0; sampler < Samplers.size(); ++sampler)
     {
         samplerSamples = totalSamples / (Samplers.size() - sampler);
