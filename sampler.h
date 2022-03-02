@@ -9,17 +9,14 @@
 class Sampler
 {
     public:
-        Sampler(int id, HexBoard& moveBoard, std::vector<int>& moves);
+        Sampler(int id, HexBoard& moveBoard, std::vector<std::pair<int, int>>& moves);
         int SampleMove(int move, int sampleCount);
     private:
         int ID;
         HexBoard& MoveBoard;
         HexBoard SampleBoard;
-        std::vector<int>& Moves;
-        std::vector<int> ShuffledMoves;
+        std::vector<std::pair<int, int>>& Moves;
         std::default_random_engine RandomEngine;
-
-
 };
 
 #endif

@@ -341,20 +341,16 @@ void testAIPlayerConstructor()
 
     AIPlayer aiPlayer{hexBoard};
 
-    // Check that:
-    // (1) all unoccupied cells are available to aiPlayer as a move, and no occupied cells are
-    // (2) the encodings of the cells' (x, y) pairs as single integers are correct 
+    // Check that all unoccupied cells are available to aiPlayer as a move, and no occupied cells are
 
     for (int row = 0; row < hexBoard.Height; ++row)
     {
         for (int col = 0; col < hexBoard.Width; ++col)
-        {
-            auto move = std::find(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), row * hexBoard.Width + col);
+        {            
+            auto move = std::find_if(aiPlayer.Moves.begin(), 
+                aiPlayer.Moves.end(), [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;}); 
             bool moveFound = move != aiPlayer.Moves.end();
-            if (hexBoard.GetCell(col, row) == HexBoard::EMPTY) 
-                assert(col == *move % hexBoard.Width && row == *move / hexBoard.Width);
-            else 
-                assert(move == aiPlayer.Moves.end());
+            assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
         }
     }
 }
@@ -384,10 +380,10 @@ void testRemoveMove()
     for (int row = 0; row < hexBoard.Height; ++row)
     {
         for (int col = 0; col < hexBoard.Width; ++col)
-        {
-            bool moveFound = 
-                std::find(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), row * hexBoard.Width + col) 
-                != aiPlayer.Moves.end();
+        {            
+            auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
+                    [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;});                 
+            bool moveFound = move != aiPlayer.Moves.end();
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
             assert(hexBoard.GetCell(col, row) == aiPlayer.Board.GetCell(col, row));
         }            

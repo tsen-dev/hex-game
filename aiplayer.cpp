@@ -13,14 +13,18 @@ AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) :
 
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)
-            if (hexBoard.GetCell(col, row) == HexBoard::EMPTY)
-                Moves.push_back(row * hexBoard.Width + col); 
+            if (hexBoard.GetCell(col, row) == HexBoard::EMPTY) 
+                Moves.push_back({col, row}); 
 }
 
 void AIPlayer::RemoveMove(std::pair<int, int>& move, char player)
 {
     Board.MarkCell(move.first, move.second, player);
-    Moves.erase(std::find(Moves.begin(), Moves.end(), move.second * Board.Width + move.first));
+
+    Moves.erase(
+        std::find_if(Moves.begin(), Moves.end(), [move](const std::pair<int, int>& currentMove){
+            return move.first == currentMove.first && move.second == currentMove.second;})
+    );
 }
 
 int AIPlayer::SampleMove(int move)
@@ -30,8 +34,9 @@ int AIPlayer::SampleMove(int move)
     int samplerSamples;
 
     CopyBoardState(MoveBoard, Board);
-    MoveBoard.MarkCell(Moves[move] % Board.Width, Moves[move] / Board.Width, Board.P2);
+    MoveBoard.MarkCell(Moves[move].first, Moves[move].second, Board.P2);
 
+    // Remove move from remaining moves here instead of doing it in each Sampler's SampleMove
     for (int sampler = 0; sampler < Samplers.size(); ++sampler)
     {
         samplerSamples = totalSamples / (Samplers.size() - sampler);
@@ -54,7 +59,7 @@ int AIPlayer::SampleMove(int move)
 std::pair<int, int> AIPlayer::GetMove()
 {
     clock_t time = clock();
-    std::pair<int, int> bestMove = std::pair<int, int>{Moves.front() % MoveBoard.Width, Moves.front() / MoveBoard.Width};   
+    std::pair<int, int> bestMove = Moves.front();
     int maxWins = 0;    
     int moveWins;
 
@@ -63,8 +68,7 @@ std::pair<int, int> AIPlayer::GetMove()
         if ((moveWins = SampleMove(move)) > maxWins) 
         {
             maxWins = moveWins;
-            bestMove.first = Moves[move] % MoveBoard.Width;
-            bestMove.second = Moves[move] / MoveBoard.Width;
+            bestMove = Moves[move];
         }        
     }
 

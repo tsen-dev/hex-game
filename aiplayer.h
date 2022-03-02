@@ -19,8 +19,8 @@ class AIPlayer
     private:
         int SampleMove(int move);
 
-        int SampleCount;
-        std::vector<int> Moves;        
+        int SampleCount;        
+        std::vector<std::pair<int, int>> Moves;
         HexBoard Board, MoveBoard;
         std::vector<Sampler> Samplers;
 };
