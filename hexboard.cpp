@@ -95,6 +95,21 @@ bool HexBoard::MarkCell(int x, int y, char player)
     }
 }
 
+void HexBoard::SwapPlayers()
+{
+    std::swap(P1, P2);
+    std::swap(P1Name, P2Name);
+
+    for (int row = 0; row < Height; ++row)
+    {
+        for (int col = 0; col < Width; ++col)
+        {
+            if (BoardState[row][col] == P1) BoardState[row][col] = P2;
+            else if (BoardState[row][col] == P2) BoardState[row][col] = P1;
+        }
+    }
+}
+
 bool HexBoard::TraversePathsFromCell(int x, int y, char player)
 {
     if (player == P1 && x == Width - 1) return true;

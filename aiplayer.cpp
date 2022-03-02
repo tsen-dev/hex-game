@@ -18,13 +18,16 @@ AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) :
 }
 
 void AIPlayer::RemoveMove(std::pair<int, int>& move, char player)
-{
-    Board.MarkCell(move.first, move.second, player);
-
-    Moves.erase(
+{    
+    auto moveItr = 
         std::find_if(Moves.begin(), Moves.end(), [move](const std::pair<int, int>& currentMove){
-            return move.first == currentMove.first && move.second == currentMove.second;})
-    );
+            return move.first == currentMove.first && move.second == currentMove.second;});
+
+    if (moveItr != Moves.end())
+    {
+        Moves.erase(moveItr);
+        Board.MarkCell(move.first, move.second, player);
+    }
 }
 
 int AIPlayer::SampleMove(int move)

@@ -91,7 +91,7 @@ void Settings::GetPlayerMarkers()
         std::cin >> PlayerMarkers.second;
     }
     
-    std::getline(std::cin, std::string{}); // Consume newline in std::cin   
+    std::getline(std::cin, std::string{}); // Consume trailing newline in std::cin   
     std::cout << '\n';
 }
 
@@ -106,7 +106,7 @@ void Settings::GetPlayerNames()
     else
     {
         std::cout << "\nEnter player 2's name:\n\n";
-        std::getline(std::cin, PlayerNames.first);
+        std::getline(std::cin, PlayerNames.second);
     }    
 
     std::cout << '\n';

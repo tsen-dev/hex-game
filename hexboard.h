@@ -14,16 +14,17 @@ class HexBoard
         ~HexBoard();        
         char GetCell(int x, int y) const;
         bool MarkCell(int x, int y, char player);
+        void SwapPlayers();
         bool HasPlayerWon(char player);
         friend bool CopyBoardState(HexBoard& dstBoard, const HexBoard& srcBoard);
         friend std::ostream& operator<<(std::ostream& out, const HexBoard& HexBoard);
 
         const int Width;
         const int Height;
-        const char P1;
-        const char P2;
-        const std::string P1Name;
-        const std::string P2Name;
+        char P1;
+        char P2;
+        std::string P1Name;
+        std::string P2Name;
 
         static const char EMPTY = '.';
         static const char OUT_OF_BOUNDS = '\0';
