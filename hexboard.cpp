@@ -170,6 +170,9 @@ bool CopyBoardState(HexBoard& dstBoard, const HexBoard& srcBoard)
         for (int col = 0; col < dstBoard.Width; ++col)
             dstBoard.BoardState[row][col] = srcBoard.BoardState[row][col];
 
+    dstBoard.P1 = srcBoard.P1;
+    dstBoard.P2 = srcBoard.P2;
+
     return true;
 }
 

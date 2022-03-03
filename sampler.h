@@ -9,10 +9,14 @@
 class Sampler
 {
     public:
-        Sampler(int id, HexBoard& moveBoard, std::vector<std::pair<int, int>>& moves);
+        Sampler(int id, HexBoard& moveBoard, std::vector<std::pair<int, int>>& moves, char myPlayer);
         int SampleMove(int move, int sampleCount);
     private:
+        void PlayRemainingMoves(std::vector<int>& moveIndices, char& currentPlayer);
+        void PlayRemainingMovesReverse(std::vector<int>& moveIndices, char& currentPlayer);
+
         int ID;
+        char MyPlayer;
         HexBoard& MoveBoard;
         HexBoard SampleBoard;
         std::vector<std::pair<int, int>>& Moves;

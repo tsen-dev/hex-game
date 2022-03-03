@@ -47,40 +47,35 @@ void startGame()
     {
         std::cout << hexBoard;
 
-        if (currentPlayer == hexBoard.P1)
+        if (currentPlayer == settings.PlayerMarkers.first)
         {   
-            std::cout << hexBoard.P1Name << (tolower(hexBoard.P1Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";         
+            std::cout << settings.PlayerNames.first << (tolower(settings.PlayerNames.first.back()) == 's' ? "'" : "'s") << " Turn:\n\nEnter your move: \n\n";         
             getMove(move, hexBoard);
             hexBoard.MarkCell(move.first, move.second, currentPlayer);
         }
 
         else 
         {
-            std::cout << hexBoard.P2Name << (tolower(hexBoard.P2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                            
+            std::cout << settings.PlayerNames.second << (tolower(settings.PlayerNames.second.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                            
 
             if (settings.SinglePlayer)
             {
-                move = aiPlayer.GetMove();
-                hexBoard.MarkCell(move.first, move.second, currentPlayer);
+                if ((move = aiPlayer.GetMove(firstMove)) == AIPlayer::SWAP) hexBoard.SwapPlayers();
+                else hexBoard.MarkCell(move.first, move.second, currentPlayer);
             }     
 
             else
             {
-                if (firstMove == true && offerSwap(hexBoard) == true) 
-                {
-                    hexBoard.SwapPlayers();
-                    currentPlayer = hexBoard.P1;
-                }
-                    
+                if (firstMove == true && offerSwap(hexBoard) == true) hexBoard.SwapPlayers();                    
                 else
                 {
                     std::cout << "Enter your move:\n\n";
                     getMove(move, hexBoard);                    
                     hexBoard.MarkCell(move.first, move.second, currentPlayer);
-                }      
+                }                      
+            }          
 
-                firstMove = false;
-            }            
+            firstMove = false;  
         }
 
         aiPlayer.RemoveMove(move, currentPlayer);

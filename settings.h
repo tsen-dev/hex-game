@@ -9,8 +9,8 @@ struct Settings
         std::pair<char, char> PlayerMarkers;
         std::pair<std::string, std::string> PlayerNames;        
         bool SinglePlayer;
-        int AIDifficulty;
-        int AIThreadCount;
+        int AIDifficulty = 0;
+        int AIThreadCount = 0;
 
     private:
         void GetBoardSize();

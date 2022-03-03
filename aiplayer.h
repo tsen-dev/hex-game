@@ -11,18 +11,24 @@ class AIPlayer
 {
     public:
         AIPlayer(HexBoard& hexBoard, int sampleCount = 1000, int samplerCount = 8);
-        std::pair<int, int> GetMove();
+        std::pair<int, int> GetMove(bool firstMove);
+        int SampleSwap();
         void RemoveMove(std::pair<int, int>& move, char player);        
         friend void testAIPlayerConstructor();
         friend void testRemoveMove();
+
+        static const std::pair<int, int> SWAP;        
+        static const int TRY_SWAP = -1;
 
     private:
         int SampleMove(int move);
 
         int SampleCount;        
+        char MyPlayer;
         std::vector<std::pair<int, int>> Moves;
-        HexBoard Board, MoveBoard;
-        std::vector<Sampler> Samplers;
+        HexBoard& Board;
+        HexBoard MoveBoard;
+        std::vector<Sampler> Samplers;                
 };
 
 #endif

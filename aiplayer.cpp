@@ -5,11 +5,13 @@
 #include "aiplayer.h"
 #include "hexboard.h"
 
+const std::pair<int, int> AIPlayer::SWAP = {-1, -1};
+
 AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) : 
-    SampleCount{sampleCount}, Board{hexBoard}, MoveBoard{hexBoard}
+    SampleCount{sampleCount}, MyPlayer{hexBoard.P2}, Board{hexBoard}, MoveBoard{hexBoard}
 {
     for (int sampler = 0; sampler < samplerCount; ++sampler)
-        Samplers.push_back(Sampler{sampler, MoveBoard, Moves});
+        Samplers.push_back(Sampler{sampler, MoveBoard, Moves, hexBoard.P2});
 
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)
@@ -23,11 +25,8 @@ void AIPlayer::RemoveMove(std::pair<int, int>& move, char player)
         std::find_if(Moves.begin(), Moves.end(), [move](const std::pair<int, int>& currentMove){
             return move.first == currentMove.first && move.second == currentMove.second;});
 
-    if (moveItr != Moves.end())
-    {
+    if (moveItr != Moves.end()) 
         Moves.erase(moveItr);
-        Board.MarkCell(move.first, move.second, player);
-    }
 }
 
 int AIPlayer::SampleMove(int move)
@@ -37,7 +36,8 @@ int AIPlayer::SampleMove(int move)
     int samplerSamples;
 
     CopyBoardState(MoveBoard, Board);
-    MoveBoard.MarkCell(Moves[move].first, Moves[move].second, Board.P2);
+    if (move == TRY_SWAP) MoveBoard.SwapPlayers();
+    else MoveBoard.MarkCell(Moves[move].first, Moves[move].second, MyPlayer);
 
     for (int sampler = 0; sampler < Samplers.size(); ++sampler)
     {
@@ -46,7 +46,7 @@ int AIPlayer::SampleMove(int move)
             std::launch::async, &Sampler::SampleMove, &Samplers[sampler], move, samplerSamples));
         totalSamples -= samplerSamples;
     }
-        
+    
     int wins = 0;
 
     for (int sampler = 0; sampler < Samplers.size(); ++sampler)
@@ -58,7 +58,7 @@ int AIPlayer::SampleMove(int move)
     return wins;
 }
 
-std::pair<int, int> AIPlayer::GetMove()
+std::pair<int, int> AIPlayer::GetMove(bool firstMove)
 {
     clock_t time = clock();
     std::pair<int, int> bestMove = Moves.front();
@@ -74,7 +74,8 @@ std::pair<int, int> AIPlayer::GetMove()
         }        
     }
 
-    std::cout << (double) (clock() - time) / CLOCKS_PER_SEC;
+    std::cout << (double) (clock() - time) / CLOCKS_PER_SEC  << '\n';
 
-    return bestMove;
+    if (firstMove && SampleMove(TRY_SWAP) > maxWins) return SWAP;
+    else return bestMove; 
 }
