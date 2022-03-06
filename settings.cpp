@@ -4,19 +4,23 @@
 #include "settings.h"
 #include "hexboard.h"
 
+/* Prompt user to enter game settings and read responses into member variables.
+Also prompt for AI settings if user has selected singleplayer */
 Settings::Settings()
 {
     GetBoardSize();
     GetPlayerMode();
-    if (SinglePlayer == true) 
+    if (SinglePlayer) 
     {
         GetAIDifficulty();
         GetAIThreadCount();
     }    
     GetPlayerMarkers();
-    GetPlayerNames();
+    GetPlayerNames(SinglePlayer);
 }
 
+/* Prompt user to enter board dimensions (width and height, separated by spaces). 
+Display prompt until a valid input is entered, and read the response into BoardSize */
 void Settings::GetBoardSize()
 {    
     BoardSize = std::pair<int, int>{0, 0};
@@ -27,9 +31,12 @@ void Settings::GetBoardSize()
         std::cin >> BoardSize.first >> BoardSize.second;
     }
 
+    std::getline(std::cin, std::string{}); // Consume trailing newline in std::cin
     std::cout << '\n';
 }
 
+/* Prompt user to select singleplayer or multiplayer. 
+Display prompt until a valid input is entered, and read the response into SinglePlayer */
 void Settings::GetPlayerMode()
 {
     char response = 0;
@@ -42,9 +49,12 @@ void Settings::GetPlayerMode()
 
     SinglePlayer = (response == 'Y');
 
+    std::getline(std::cin, std::string{}); // Consume trailing newline in std::cin
     std::cout << '\n';
 }
 
+/* Prompt user to enter the AI difficulty.
+Display prompt until a valid input is entered, and read the response into AIDifficulty */
 void Settings::GetAIDifficulty()
 {
     AIDifficulty = -1;
@@ -55,9 +65,12 @@ void Settings::GetAIDifficulty()
         std::cin >> AIDifficulty;
     }
     
+    std::getline(std::cin, std::string{}); // Consume trailing newline in std::cin
     std::cout << '\n';
 }
 
+/* Prompt user to enter the number of AI threads.
+Display prompt until a valid input is entered, and read the response into AIThreadCount */
 void Settings::GetAIThreadCount()
 {
     AIThreadCount = -1;
@@ -68,9 +81,12 @@ void Settings::GetAIThreadCount()
         std::cin >> AIThreadCount;
     }
     
+    std::getline(std::cin, std::string{}); // Consume trailing newline in std::cin
     std::cout << '\n';
 }
 
+/* Prompt user to enter the markers for player 1 and player 2. Display prompts until valid inputs are entered i.e. markers 
+are different for each player and don't use reserved EMPTY and OUT_OF_BOUNDS values. Read the responses into PlayerMarkers */
 void Settings::GetPlayerMarkers()
 {
     std::cout << "Enter player 1's marker:\n\n";
@@ -95,12 +111,14 @@ void Settings::GetPlayerMarkers()
     std::cout << '\n';
 }
 
-void Settings::GetPlayerNames()
+/* Prompt user to enter the names for player 1 and player 2. Player 2's name is set to "CPU" if in singleplayer mode.
+Display prompts until valids inputs are entered, and read the response into PlayerNames */
+void Settings::GetPlayerNames(bool singlePlayer)
 {
     std::cout << "Enter player 1's name:\n\n";
     std::getline(std::cin, PlayerNames.first);
 
-    if (SinglePlayer == true)
+    if (singlePlayer)
         PlayerNames.second = "CPU";
 
     else

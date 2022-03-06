@@ -5,7 +5,8 @@ struct Settings
 {
     public:
         Settings();
-        std::pair<int, int> BoardSize;        
+        
+        std::pair<int, int> BoardSize;
         std::pair<char, char> PlayerMarkers;
         std::pair<std::string, std::string> PlayerNames;        
         bool SinglePlayer;
@@ -13,12 +14,12 @@ struct Settings
         int AIThreadCount = 0;
 
     private:
-        void GetBoardSize();
-        void GetPlayerMarkers();
-        void GetPlayerNames();
-        void GetPlayerMode();
+        void GetBoardSize();        
+        void GetPlayerMode();        
         void GetAIDifficulty();
         void GetAIThreadCount();
+        void GetPlayerMarkers();
+        void GetPlayerNames(bool singlePlayer);        
 };
 
 #endif
