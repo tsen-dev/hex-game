@@ -76,6 +76,6 @@ std::pair<int, int> AIPlayer::GetMove(bool firstMove)
 
     std::cout << (double) (clock() - time) / CLOCKS_PER_SEC  << '\n';
 
-    if (firstMove && SampleMove(TRY_SWAP) > maxWins) return SWAP;
+    if (firstMove && SampleMove(AIPlayer::TRY_SWAP) > maxWins) return SWAP;
     else return bestMove; 
 }

@@ -18,7 +18,7 @@ class AIPlayer
         friend void testRemoveMove();
 
         static const std::pair<int, int> SWAP;        
-        static const int TRY_SWAP = -1;
+        static const int TRY_SWAP = Sampler::TRY_SWAP;
 
     private:
         int SampleMove(int move);
