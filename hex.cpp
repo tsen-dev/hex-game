@@ -44,6 +44,7 @@ bool offerSwap(HexBoard& hexBoard)
     return swapResponse == 'Y';
 }
 
+// Prompt player 1 for a valid move and play that move on the board. Return the played move
 std::pair<int, int> playP1Turn(std::string& p1Name, char p1Marker, HexBoard& hexBoard)
 {
     std::cout << p1Name << (tolower(p1Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";         
@@ -55,6 +56,8 @@ std::pair<int, int> playP1Turn(std::string& p1Name, char p1Marker, HexBoard& hex
     return move;
 }
 
+/* Prompt player 2 for a valid move and play that move on the board. Offer player 2 a swap before prompting for a move 
+if it's their first move. If player 2 swaps, swap the players on the board and return SWAP, otherwise play the move and return it */
 std::pair<int, int> playHumanP2Turn(std::string& p2Name, char p2Marker, HexBoard& hexBoard, bool firstMove)
 {
     std::cout << p2Name << (tolower(p2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                               
@@ -73,6 +76,8 @@ std::pair<int, int> playHumanP2Turn(std::string& p2Name, char p2Marker, HexBoard
     }
 }
 
+/* Prompt the AI player 2 for a move and play that move on the board. The AI player 2 can swap if this is its first move. 
+If AI player swaps, return SWAP, otherwise play the move and return it */
 std::pair<int, int> playAIP2Turn(std::string& p2Name, char p2Marker, HexBoard& hexBoard, bool firstMove, AIPlayer& aiPlayer)
 {    
     std::cout << p2Name << (tolower(p2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                           
@@ -92,13 +97,16 @@ std::pair<int, int> playAIP2Turn(std::string& p2Name, char p2Marker, HexBoard& h
     }    
 }
 
+/* Prompts the user to enter the game's settings (board size, player names, etc), then starts a hex game loop. At each 
+iteration, the other player is prompted for a move, then the board is checked for a win. The loop exits when a player wins. 
+On their first move, player 2 can swap with player 1 instead of playing a move */
 void startGame()
 {
     Settings settings{};
     HexBoard hexBoard{settings};
     AIPlayer aiPlayer{hexBoard, settings.AIDifficulty, settings.AIThreadCount};    
     std::pair<int, int> move;
-    bool firstMove = true; // Whether player 2 can swap with player 1
+    bool p2FirstMove = true; // Whether it is player 2's first move 
     char currentPlayer = hexBoard.P1;
     
     while (true)
@@ -111,11 +119,11 @@ void startGame()
         else 
         {
             if (settings.SinglePlayer) move = playAIP2Turn(
-                settings.PlayerNames.second, settings.PlayerMarkers.second, hexBoard, firstMove, aiPlayer);                
+                settings.PlayerNames.second, settings.PlayerMarkers.second, hexBoard, p2FirstMove, aiPlayer);                
             else move = playHumanP2Turn(
-                settings.PlayerNames.second, settings.PlayerMarkers.second, hexBoard, firstMove);
+                settings.PlayerNames.second, settings.PlayerMarkers.second, hexBoard, p2FirstMove);
 
-            firstMove = false;
+            p2FirstMove = false;
         }
 
         aiPlayer.RemoveMove(move);
