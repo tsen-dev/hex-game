@@ -30,7 +30,7 @@ void testMarkCell()
     int boardHeight = 3;   
     HexBoard hexBoard{boardWidth, boardHeight};
 
-    // Suppress error output so "(x, y) is occupied" messages don't slow tests
+    // Suppress error output so "(x, y) is occupied" messages don't clutter test output
     auto cerrBuffer = std::cerr.rdbuf();
     std::cerr.rdbuf(nullptr);
 
@@ -71,7 +71,7 @@ void testGetCell()
     assert(hexBoard.GetCell(0, boardHeight) == HexBoard::OUT_OF_BOUNDS);
     assert(hexBoard.GetCell(boardWidth, 0) == HexBoard::OUT_OF_BOUNDS);
     
-    // Check that the correct value of retrieved for cell in the game's bounds
+    // Check that the correct value is retrieved for a cell in the game's bounds
 
     assert(hexBoard.GetCell(boardWidth - 1, boardHeight - 1) == HexBoard::EMPTY);
 }
@@ -347,8 +347,8 @@ void testAIPlayerConstructor()
     {
         for (int col = 0; col < hexBoard.Width; ++col)
         {            
-            auto move = std::find_if(aiPlayer.Moves.begin(), 
-                aiPlayer.Moves.end(), [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;}); 
+            auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
+                [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;}); 
             bool moveFound = move != aiPlayer.Moves.end();
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
         }
@@ -363,28 +363,25 @@ void testRemoveMove()
     HexBoard hexBoard{board1Width, board1Height};
     AIPlayer aiPlayer{hexBoard};
 
-    // Check that:
-    // (1) Each played move is removed from aiPlayer's list of available moves
-    // (2) the state of aiPlayer's board is kept consistent with the main board
+    // Check that each played move is removed from aiPlayer's list of available moves
 
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
     {
         hexBoard.MarkCell(i, i, hexBoard.P1);
-        aiPlayer.RemoveMove(std::pair<int, int>{i, i}, hexBoard.P1);
+        aiPlayer.RemoveMove(std::pair<int, int>{i, i});
     }
 
     hexBoard.MarkCell(board1Width - 1, board1Height - 1, hexBoard.P2);
-    aiPlayer.RemoveMove(std::pair<int, int>{board1Width - 1, board1Height - 1}, hexBoard.P2);
+    aiPlayer.RemoveMove(std::pair<int, int>{board1Width - 1, board1Height - 1});
 
     for (int row = 0; row < hexBoard.Height; ++row)
     {
         for (int col = 0; col < hexBoard.Width; ++col)
         {            
             auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
-                    [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;});                 
-            bool moveFound = move != aiPlayer.Moves.end();
+                [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;});                 
+            bool moveFound = move != aiPlayer.Moves.end();            
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
-            assert(hexBoard.GetCell(col, row) == aiPlayer.Board.GetCell(col, row));
         }            
     }
 }
