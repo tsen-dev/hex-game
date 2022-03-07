@@ -18,3 +18,4 @@ Random games are simulated by shuffling a list of the remaining moves and playin
 - The board is not checked for a win until all moves are played as playing a move is much faster than checking for a win. This reduces the number of win checks.
 - Instead of shuffling a list of moves i.e. (int, int) pairs, a list of indices are shuffled to reduce the number of swap operations.
 - A shuffled order is re-used by iterating through it in reverse. This halves the number of shuffle operations required 
+- To parallelise the simulation process, the AI player starts sampler threads (known as AI threads), each of which simulates its own portion of the total number of simulations to be done for each move.
