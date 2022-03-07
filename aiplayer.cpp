@@ -7,6 +7,7 @@
 
 const std::pair<int, int> AIPlayer::SWAP = {-1, -1};
 
+// Creates an AIPlayer and writes all of hexBoard's unplayed moves into Moves
 AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) : 
     SampleCount{sampleCount}, MyPlayer{hexBoard.P2}, Board{hexBoard}, MoveBoard{hexBoard}
 {
@@ -19,7 +20,8 @@ AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) :
                 Moves.push_back({col, row}); 
 }
 
-void AIPlayer::RemoveMove(std::pair<int, int>& move)
+// Remove the specified move from Moves, if it exists
+void AIPlayer::RemoveMove(const std::pair<int, int>& move)
 {    
     auto moveItr = 
         std::find_if(Moves.begin(), Moves.end(), [move](const std::pair<int, int>& currentMove){
@@ -29,6 +31,8 @@ void AIPlayer::RemoveMove(std::pair<int, int>& move)
         Moves.erase(moveItr);
 }
 
+/* If move is TRY_SWAP, swap MoveBoard's players, otherwise play the move to be sampled on MoveBoard. Then simulate 
+SampleCount many random games from MoveBoard's state and return the number of wins. move is an index into Moves */
 int AIPlayer::SampleMove(int move)
 {
     std::vector<std::future<int>> winCounts;            
@@ -58,9 +62,11 @@ int AIPlayer::SampleMove(int move)
     return wins;
 }
 
+/* Simulate SampleCount many random games for each of the remaining moves. If firstMove is true, also try swapping 
+the players instead of playing a move. Return the move resulting in the most number of wins, or SWAP if swapping was 
+more successful */
 std::pair<int, int> AIPlayer::GetMove(bool firstMove)
 {
-    clock_t time = clock();
     std::pair<int, int> bestMove = Moves.front();
     int maxWins = 0;    
     int moveWins;
@@ -73,8 +79,6 @@ std::pair<int, int> AIPlayer::GetMove(bool firstMove)
             bestMove = Moves[move];
         }        
     }
-
-    std::cout << (double) (clock() - time) / CLOCKS_PER_SEC  << '\n';
 
     if (firstMove && SampleMove(AIPlayer::TRY_SWAP) > maxWins) return SWAP;
     else return bestMove; 
