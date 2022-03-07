@@ -19,7 +19,7 @@ AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) :
                 Moves.push_back({col, row}); 
 }
 
-void AIPlayer::RemoveMove(std::pair<int, int>& move, char player)
+void AIPlayer::RemoveMove(std::pair<int, int>& move)
 {    
     auto moveItr = 
         std::find_if(Moves.begin(), Moves.end(), [move](const std::pair<int, int>& currentMove){

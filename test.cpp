@@ -367,7 +367,6 @@ void testRemoveMove()
     // (1) Each played move is removed from aiPlayer's list of available moves
     // (2) the state of aiPlayer's board is kept consistent with the main board
 
-
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
     {
         hexBoard.MarkCell(i, i, hexBoard.P1);

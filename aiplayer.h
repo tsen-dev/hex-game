@@ -13,7 +13,7 @@ class AIPlayer
         AIPlayer(HexBoard& hexBoard, int sampleCount = 1000, int samplerCount = 8);
         std::pair<int, int> GetMove(bool firstMove);
         int SampleSwap();
-        void RemoveMove(std::pair<int, int>& move, char player);        
+        void RemoveMove(std::pair<int, int>& move);        
         friend void testAIPlayerConstructor();
         friend void testRemoveMove();
 
