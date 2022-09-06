@@ -5,11 +5,11 @@
 
 #ifndef TEST
 
-int main()
-{
-    startGame();
+// int main()
+// {
+//     startGame();
 
-    return 0;
-}
+//     return 0;
+// }
 
 #endif
