@@ -9,7 +9,7 @@ class HexBoard
 {
     public:
         // Create a hex board of size width x height
-        HexBoard(int width, int height, char p1 = 'X', char p2 = 'O', std::string p1Name = "P1", std::string p2Name = "P2");        
+        HexBoard(int width = 7, int height = 7, char p1 = 'X', char p2 = 'O', std::string p1Name = "P1", std::string p2Name = "P2");        
         // Create a deep copy of the specified board
         HexBoard(const HexBoard& hexBoard);         
         // Create a board using the configuration specified in the settings object        

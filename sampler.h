@@ -9,7 +9,7 @@
 class Sampler
 {
     public:
-        // Create a sampler. The sampler's RandomEngine is seeded with sum of the current time and the specified id
+        // Create a sampler. The sampler's RandomEngine is seeded with sum of the current CPU clock and the specified id
         Sampler(int id, HexBoard& moveBoard, std::vector<std::pair<int, int>>& moves, char myPlayer);
         /* Simulate sampleCount many random games from MoveBoard's state and return the number of times MyPlayer won. 
         Setting move to TRY_SWAP signals that (1) a swap should be simulated i.e. there is no move to be removed as one 

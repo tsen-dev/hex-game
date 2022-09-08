@@ -6,6 +6,7 @@
 
 #include "hexboard.h"
 #include "sampler.h"
+#include "threadpool.h"
 
 class AIPlayer
 {
@@ -36,7 +37,9 @@ class AIPlayer
         std::vector<std::pair<int, int>> Moves; // The remaining moves that can be played
         HexBoard& Board; // The main game board
         HexBoard MoveBoard; // A board that a move to be tested will be played on
-        std::vector<Sampler> Samplers;                
+        std::vector<Sampler> Samplers;   
+        ThreadPool ThreadPool;
+
 };
 
 #endif

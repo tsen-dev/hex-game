@@ -1,9 +1,9 @@
 #include "sampler.h"
 #include "aiplayer.h"
 
-// Create a sampler. The sampler's RandomEngine is seeded with sum of the current time and the specified id
+// Create a sampler. The sampler's RandomEngine is seeded with sum of the current CPU clock and the specified id
 Sampler::Sampler(int id, HexBoard& moveBoard, std::vector<std::pair<int, int>>& moves, char myPlayer) :
-ID{id}, MyPlayer{myPlayer}, MoveBoard{moveBoard}, SampleBoard{moveBoard}, Moves{moves}, RandomEngine{time(nullptr) + id} {}
+ID{id}, MyPlayer{myPlayer}, MoveBoard{moveBoard}, SampleBoard{moveBoard}, Moves{moves}, RandomEngine{clock() + id} {}
 
 /* Play all remaining moves on the SampleBoard, alternating players at each move. moveIndices indexes into Moves, 
 and is played in front order */
@@ -31,7 +31,7 @@ void Sampler::PlayRemainingMovesReverse(std::vector<int>& moveIndices, char curr
 Setting move to TRY_SWAP signals that (1) a swap should be simulated i.e. there is no move to be removed as one 
 wasn't played, (2) the players of MoveBoard have been swapped */
 int Sampler::SampleMove(int move, int sampleCount)
-{
+{    
     std::vector<int> moveIndices(Moves.size());
     for (int move = 0; move < Moves.size(); ++move) 
         moveIndices[move] = move;

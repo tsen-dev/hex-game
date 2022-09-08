@@ -5,11 +5,11 @@
 #include "aiplayer.h"
 #include "hexboard.h"
 
-const std::pair<int, int> AIPlayer::SWAP = {-1, -1};
+const std::pair<int, int> AIPlayer::SWAP = {-1, -1}; // Initialised here as this type can't have an in-class initialiser
 
 // Creates an AIPlayer and writes all of hexBoard's unplayed moves into Moves
 AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) : 
-    SampleCount{sampleCount}, MyPlayer{hexBoard.P2}, Board{hexBoard}, MoveBoard{hexBoard}
+    SampleCount{sampleCount}, MyPlayer{hexBoard.P2}, Board{hexBoard}, MoveBoard{hexBoard}, ThreadPool{samplerCount}
 {
     for (int sampler = 0; sampler < samplerCount; ++sampler)
         Samplers.push_back(Sampler{sampler, MoveBoard, Moves, hexBoard.P2});
@@ -40,14 +40,14 @@ int AIPlayer::SampleMove(int move)
     int samplerSamples;
 
     CopyBoardState(MoveBoard, Board);
+    
     if (move == TRY_SWAP) MoveBoard.SwapPlayers();
     else MoveBoard.MarkCell(Moves[move].first, Moves[move].second, MyPlayer);
 
     for (int sampler = 0; sampler < Samplers.size(); ++sampler)
     {
         samplerSamples = totalSamples / (Samplers.size() - sampler);
-        winCounts.push_back(std::async(
-            std::launch::async, &Sampler::SampleMove, &Samplers[sampler], move, samplerSamples));
+        winCounts.push_back(ThreadPool.EnqueueWork(&Sampler::SampleMove, &Samplers[sampler], move, samplerSamples));
         totalSamples -= samplerSamples;
     }
     

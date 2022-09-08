@@ -2,6 +2,8 @@
 #include <ctype.h>
 #include <string>
 
+#include <chrono>
+
 #include "settings.h"
 #include "hexboard.h"
 #include "aiplayer.h"
