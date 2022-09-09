@@ -1,6 +1,6 @@
 # Contents
-- [Gameplay](https://github.com/tsen-dev/hex-game/new/master?readme=1#gameplay)
-- [Implementation Details](https://github.com/tsen-dev/hex-game/new/master?readme=1#implementation-details)
+- [Gameplay](https://github.com/tsen-dev/hex-game/#gameplay)
+- [Implementation Details](https://github.com/tsen-dev/hex-game/#implementation-details)
 
 # Gameplay
 ### Singleplayer
