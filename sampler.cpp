@@ -1,8 +1,9 @@
 #include "sampler.h"
 #include "aiplayer.h"
+#include "move.h"
 
 // Create a sampler. The sampler's RandomEngine is seeded with sum of the current CPU clock and the specified id
-Sampler::Sampler(int id, HexBoard& moveBoard, std::vector<std::pair<int, int>>& moves, char myPlayer) :
+Sampler::Sampler(int id, HexBoard& moveBoard, std::vector<Move>& moves, char myPlayer) :
 ID{id}, MyPlayer{myPlayer}, MoveBoard{moveBoard}, SampleBoard{moveBoard}, Moves{moves}, RandomEngine{clock() + id} {}
 
 /* Play all remaining moves on the SampleBoard, alternating players at each move. moveIndices indexes into Moves, 
@@ -11,7 +12,7 @@ void Sampler::PlayRemainingMoves(std::vector<int>& moveIndices, char currentPlay
 {
     for (int move = 0; move < moveIndices.size(); ++move)
     {
-        SampleBoard.MarkCell(Moves[moveIndices[move]].first, Moves[moveIndices[move]].second, currentPlayer);
+        SampleBoard.MarkCell(Moves[moveIndices[move]].X, Moves[moveIndices[move]].Y, currentPlayer);
         currentPlayer = (currentPlayer == MoveBoard.P1) ? MoveBoard.P2 : MoveBoard.P1;
     }          
 }
@@ -22,7 +23,7 @@ void Sampler::PlayRemainingMovesReverse(std::vector<int>& moveIndices, char curr
 {
     for (int move = moveIndices.size() - 1; move >= 0; --move)
     {
-        SampleBoard.MarkCell(Moves[moveIndices[move]].first, Moves[moveIndices[move]].second, currentPlayer);
+        SampleBoard.MarkCell(Moves[moveIndices[move]].X, Moves[moveIndices[move]].Y, currentPlayer);
         currentPlayer = (currentPlayer == MoveBoard.P1) ? MoveBoard.P2 : MoveBoard.P1;
     }     
 }

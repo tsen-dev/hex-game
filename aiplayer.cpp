@@ -4,8 +4,9 @@
 
 #include "aiplayer.h"
 #include "hexboard.h"
+#include "move.h"
 
-const std::pair<int, int> AIPlayer::SWAP = {-1, -1}; // Initialised here as this type can't have an in-class initialiser
+const Move AIPlayer::SWAP = {-1, -1}; // Initialised here as this type can't have an in-class initialiser
 
 // Creates an AIPlayer and writes all of hexBoard's unplayed moves into Moves
 AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) : 
@@ -21,11 +22,10 @@ AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) :
 }
 
 // Remove the specified move from Moves, if it exists
-void AIPlayer::RemoveMove(const std::pair<int, int>& move)
+void AIPlayer::RemoveMove(const Move& move)
 {    
     auto moveItr = 
-        std::find_if(Moves.begin(), Moves.end(), [move](const std::pair<int, int>& currentMove){
-            return move.first == currentMove.first && move.second == currentMove.second;});
+        std::find(Moves.begin(), Moves.end(), move);
 
     if (moveItr != Moves.end()) 
         Moves.erase(moveItr);
@@ -42,7 +42,7 @@ int AIPlayer::SampleMove(int move)
     CopyBoardState(MoveBoard, Board);
     
     if (move == TRY_SWAP) MoveBoard.SwapPlayers();
-    else MoveBoard.MarkCell(Moves[move].first, Moves[move].second, MyPlayer);
+    else MoveBoard.MarkCell(Moves[move].X, Moves[move].Y, MyPlayer);
 
     for (int sampler = 0; sampler < Samplers.size(); ++sampler)
     {
@@ -65,9 +65,9 @@ int AIPlayer::SampleMove(int move)
 /* Simulate SampleCount many random games for each of the remaining moves. If firstMove is true, also try swapping 
 the players instead of playing a move. Return the move resulting in the most number of wins, or SWAP if swapping was 
 more successful */
-std::pair<int, int> AIPlayer::GetMove(bool firstMove)
+Move AIPlayer::GetMove(bool firstMove)
 {
-    std::pair<int, int> bestMove = Moves.front();
+    Move bestMove = Moves.front();
     int maxWins = 0;    
     int moveWins;
 

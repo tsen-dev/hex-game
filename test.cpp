@@ -3,6 +3,7 @@
 
 #include "hexboard.h"
 #include "aiplayer.h"
+#include "move.h"
 #include "test.h"
 
 #ifdef TEST
@@ -348,7 +349,7 @@ void testAIPlayerConstructor()
         for (int col = 0; col < hexBoard.Width; ++col)
         {            
             auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
-                [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;}); 
+                [col, row](const Move& move){return move.X == col && move.Y == row;}); 
             bool moveFound = move != aiPlayer.Moves.end();
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
         }
@@ -368,18 +369,18 @@ void testRemoveMove()
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
     {
         hexBoard.MarkCell(i, i, hexBoard.P1);
-        aiPlayer.RemoveMove(std::pair<int, int>{i, i});
+        aiPlayer.RemoveMove(Move{i, i});
     }
 
     hexBoard.MarkCell(board1Width - 1, board1Height - 1, hexBoard.P2);
-    aiPlayer.RemoveMove(std::pair<int, int>{board1Width - 1, board1Height - 1});
+    aiPlayer.RemoveMove(Move{board1Width - 1, board1Height - 1});
 
     for (int row = 0; row < hexBoard.Height; ++row)
     {
         for (int col = 0; col < hexBoard.Width; ++col)
         {            
             auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
-                [col, row](const std::pair<int, int>& move){return move.first == col && move.second == row;});                 
+                [col, row](const Move& move){return move.X == col && move.Y == row;});                 
             bool moveFound = move != aiPlayer.Moves.end();            
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
         }            

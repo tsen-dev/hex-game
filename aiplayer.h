@@ -7,6 +7,7 @@
 #include "hexboard.h"
 #include "sampler.h"
 #include "threadpool.h"
+#include "move.h"
 
 class AIPlayer
 {
@@ -16,15 +17,15 @@ class AIPlayer
         /* Simulate SampleCount many random games for each of the remaining moves. If firstMove is true, also try swapping 
         the players instead of playing a move. Return the move resulting in the most number of wins, or SWAP if swapping was 
         more successful */      
-        std::pair<int, int> GetMove(bool firstMove);
+        Move GetMove(bool firstMove);
         // Remove the specified move from Moves, if it exists
-        void RemoveMove(const std::pair<int, int>& move);        
+        void RemoveMove(const Move& move);        
 
         // Test functions
         friend void testAIPlayerConstructor();
         friend void testRemoveMove();
 
-        static const std::pair<int, int> SWAP;        
+        static const Move SWAP;        
         static const int TRY_SWAP = Sampler::TRY_SWAP;
 
     private:
@@ -34,7 +35,7 @@ class AIPlayer
 
         int SampleCount;        
         char MyPlayer;
-        std::vector<std::pair<int, int>> Moves; // The remaining moves that can be played
+        std::vector<Move> Moves; // The remaining moves that can be played
         HexBoard& Board; // The main game board
         HexBoard MoveBoard; // A board that a move to be tested will be played on
         std::vector<Sampler> Samplers;   
