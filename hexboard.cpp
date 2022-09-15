@@ -3,79 +3,21 @@
 
 #include "hexboard.h"
 
-// Allocate the memory for BoardState, initialising each cell to HexBoard::EMPTY
-void HexBoard::InitialiseBoardState()
-{
-    BoardState = new char* [Height];
-
-    for (int row = 0; row < Height; ++row)
-    {
-        BoardState[row] = new char[Width];
-
-        for (int col = 0; col < Width; ++col)
-        {
-            BoardState[row][col] = HexBoard::EMPTY;
-        }            
-    }
-}
-
-// Allocate the memory for VisitedCells, initialising each element to false
-void HexBoard::InitialiseVisitedCells()
-{
-    VisitedCells = new bool* [Height];
-
-    for (int row = 0; row < Height; ++row)
-    {
-        VisitedCells[row] = new bool[Width];
-
-        for (int col = 0; col < Width; ++col)
-        {
-            VisitedCells[row][col] = false;
-        }            
-    }        
-}
-
 // Create a hex board of size width x height
-HexBoard::HexBoard(int width, int height, char p1, char p2, std::string p1Name, std::string p2Name) 
-    : Width{width}, Height{height}, P1{p1}, P2{p2}, P1Name{p1Name}, P2Name{p2Name}
-{
-    InitialiseBoardState();
-    InitialiseVisitedCells();
-}
+HexBoard::HexBoard(int width, int height, char p1, char p2, const std::string& p1Name, const std::string& p2Name) : 
+    BoardState(width * height, HexBoard::EMPTY), Width{width}, Height{height}, P1{p1}, P2{p2}, 
+    P1Name{p1Name}, P2Name{p2Name}, VisitedCells(width * height, false) {}
 
 // Create a deep copy of the specified board
 HexBoard::HexBoard(const HexBoard& hexBoard) : 
-    Width{hexBoard.Width}, Height{hexBoard.Height}, 
-    P1{hexBoard.P1}, P2{hexBoard.P2},
-    P1Name{hexBoard.P1Name}, P2Name{hexBoard.P2Name}
-{
-    InitialiseBoardState();
-    InitialiseVisitedCells();
-    CopyBoardState(*this, hexBoard);    
-}
+    BoardState(hexBoard.BoardState), Width{hexBoard.Width}, Height{hexBoard.Height}, P1{hexBoard.P1}, P2{hexBoard.P2}, 
+    P1Name{hexBoard.P1Name}, P2Name{hexBoard.P2Name}, VisitedCells(hexBoard.Width * hexBoard.Height, false) {}
 
-// Create a board using the configuration specified in the settings object
-HexBoard::HexBoard(Settings& settings) :
-    Width{settings.BoardSize.first}, Height{settings.BoardSize.second}, 
-    P1{settings.PlayerMarkers.first}, P2{settings.PlayerMarkers.second}, 
-    P1Name{settings.PlayerNames.first}, P2Name{settings.PlayerNames.second}
-{
-    InitialiseBoardState();
-    InitialiseVisitedCells();    
-}
-
-// Deallocate the BoardState and VisitedCells memory 
-HexBoard::~HexBoard()
-{
-    for (int row = 0; row < Height; ++row)
-    {
-        delete[] BoardState[row];
-        delete[] VisitedCells[row];
-    }
-        
-    delete[] BoardState;
-    delete[] VisitedCells;
-}
+// Create a board using the configuration specified in settings
+HexBoard::HexBoard(const Settings& settings) :
+    BoardState(settings.BoardSize.first * settings.BoardSize.first, HexBoard::EMPTY), Width{settings.BoardSize.first}, 
+    Height{settings.BoardSize.second}, P1{settings.PlayerMarkers.first}, P2{settings.PlayerMarkers.second}, 
+    P1Name{settings.PlayerNames.first}, P2Name{settings.PlayerNames.second}, VisitedCells(settings.BoardSize.first * settings.BoardSize.first, false) {}
 
 // Return the state of the cell (x, y) if (x, y) is in the bounds of the board. Otherwise return HexBoard::OUT_OF_BOUNDS
 char HexBoard::GetCell(int x, int y) const
@@ -83,7 +25,7 @@ char HexBoard::GetCell(int x, int y) const
     if (x < 0 || x >= Width || y < 0 || y >= Height)    
         return HexBoard::OUT_OF_BOUNDS;
     else
-        return BoardState[y][x];        
+        return BoardState[x + y * Width];        
 }
 
 /* Change the state of the cell (x, y) to player. If (x, y) is occupied (i.e. not HexBoard::EMPTY) or out of bounds, display
@@ -93,7 +35,7 @@ bool HexBoard::MarkCell(int x, int y, char player)
     switch (GetCell(x, y))
     {
         case HexBoard::EMPTY:
-            BoardState[y][x] = player;
+            BoardState[x + y * Width] = player;
             return true;
         case HexBoard::OUT_OF_BOUNDS:
             std::cerr << '(' << x << ',' << y << ") is out of bounds\n\n";
@@ -111,12 +53,12 @@ void HexBoard::SwapPlayers()
     std::swap(P1, P2);
     std::swap(P1Name, P2Name);
 
-    for (int row = 0; row < Height; ++row)
+    for (int y = 0; y < Height; ++y)
     {
-        for (int col = 0; col < Width; ++col)
+        for (int x = 0; x < Width; ++x)
         {
-            if (BoardState[row][col] == P1) BoardState[row][col] = P2;
-            else if (BoardState[row][col] == P2) BoardState[row][col] = P1;
+            if (BoardState[x + y * Width] == P1) BoardState[x + y * Width] = P2;
+            else if (BoardState[x + y * Width] == P2) BoardState[x + y * Width] = P1;
         }
     }
 }
@@ -131,26 +73,26 @@ bool HexBoard::TraversePathsFromCell(int x, int y, char player)
     if (player == P1 && x == Width - 1) return true;
     else if (player == P2 && y == Height - 1) return true;
 
-    VisitedCells[y][x] = true;
+    VisitedCells[x + y * Width] = true;
 
     // Check cell (x, y)'s hexagonal neighbours    
 
-    if (GetCell(x - 1, y) == player && VisitedCells[y][x - 1] == false)
+    if (GetCell(x - 1, y) == player && VisitedCells[(x - 1) + y * Width] == false)
         if (TraversePathsFromCell(x - 1, y, player) == true) return true;
 
-    if (GetCell(x - 1, y + 1) == player && VisitedCells[y + 1][x - 1] == false)
+    if (GetCell(x - 1, y + 1) == player && VisitedCells[(x - 1) + (y + 1) * Width] == false)
         if (TraversePathsFromCell(x - 1, y + 1, player) == true) return true;
 
-    if (GetCell(x, y - 1) == player && VisitedCells[y - 1][x] == false)
+    if (GetCell(x, y - 1) == player && VisitedCells[x + (y - 1) * Width] == false)
         if (TraversePathsFromCell(x, y - 1, player) == true) return true;
 
-    if (GetCell(x, y + 1) == player && VisitedCells[y + 1][x] == false)
+    if (GetCell(x, y + 1) == player && VisitedCells[x + (y + 1) * Width] == false)
         if (TraversePathsFromCell(x, y + 1, player) == true) return true;
 
-    if (GetCell(x + 1, y - 1) == player && VisitedCells[y - 1][x + 1] == false)
+    if (GetCell(x + 1, y - 1) == player && VisitedCells[(x + 1) + (y - 1) * Width] == false)
         if (TraversePathsFromCell(x + 1, y - 1, player) == true) return true;
 
-    if (GetCell(x + 1, y) == player && VisitedCells[y][x + 1] == false)
+    if (GetCell(x + 1, y) == player && VisitedCells[(x + 1) + y * Width] == false)
         if (TraversePathsFromCell(x + 1, y, player) == true) return true;
 
     return false;
@@ -161,43 +103,22 @@ Return true if a winning path is found, false otherwise */
 bool HexBoard::HasPlayerWon(char player)
 {
     bool isGameWon = false;
-    int row = 0, col = 0;
+    int y = 0, x = 0;
     int end = (player == P1 ? Height : Width);
+    VisitedCells.assign(Width * Height, false);
 
-    for (int i = 0; i < end; ++i) // Look for a path from the first column (P1) or row (P2) to the opposite side
+    for (int i = 0; i < end; ++i) // Look for a path from the first column (P1) or y (P2) to the opposite side
     {
-        if (GetCell(col, row) == player && TraversePathsFromCell(col, row, player) == true)
+        if (GetCell(x, y) == player && TraversePathsFromCell(x, y, player) == true)
         {
             isGameWon = true;
             break;
         }   
 
-        player == P1 ? ++row : ++col;
+        player == P1 ? ++y : ++x;
     }
-
-    // Clear VisitedCells
-    for (int row = 0; row < Height; ++row)
-        for (int col = 0; col < Width; ++col)
-            VisitedCells[row][col] = false;
     
     return isGameWon;
-}
-
-/* Copy srcBoard's state and player markers into dstBoard. Return false if the boards have differing dimensions, 
-true otherwise. Does not perform bounds checking when accessing cells */
-bool CopyBoardState(HexBoard& dstBoard, const HexBoard& srcBoard)
-{
-    if (dstBoard.Width != srcBoard.Width || dstBoard.Height != srcBoard.Height)
-        return false;
-
-    for (int row = 0; row < dstBoard.Height; ++row)
-        for (int col = 0; col < dstBoard.Width; ++col)
-            dstBoard.BoardState[row][col] = srcBoard.BoardState[row][col];
-
-    dstBoard.P1 = srcBoard.P1;
-    dstBoard.P2 = srcBoard.P2;
-
-    return true;
 }
 
 // Return the number of digits in n

@@ -285,49 +285,6 @@ void testGameWonByPlayer2()
     }
 }
 
-void testCopyBoardState()
-{
-    // An empty hexBoard (board1) is copied into another hexBoard (board2)
-    // Player 1 marks all the cells of board1, which is then copied into a new hexBoard (board3)
-    // Check that (1) the state of board1 and hexBoard 2 are not equal, (2) the state of board1 and board3 are equal
-
-    int board1Width = 3;
-
-    HexBoard hexBoard1{board1Width, board1Width};
-    HexBoard hexBoard2{board1Width, board1Width};
-
-    // Check that copying boards of equal size returns no errors
-    assert(CopyBoardState(hexBoard2, hexBoard1) == true);
-
-    for (int row = 0; row < board1Width; ++row) 
-        for (int col = 0; col < board1Width; ++col) 
-            hexBoard1.MarkCell(col, row, hexBoard1.P1);
-
-    HexBoard hexBoard3{board1Width, board1Width};
-
-    // Check that copying boards of equal size returns no errors
-    assert(CopyBoardState(hexBoard3, hexBoard1) == true);
-
-    for (int row = 0; row < board1Width; ++row)
-    {
-        for (int col = 0; col < board1Width; ++col)
-        {
-            assert(hexBoard1.GetCell(col, row) != hexBoard2.GetCell(col, row));
-            assert(hexBoard1.GetCell(col, row) == hexBoard3.GetCell(col, row));
-        }
-    }
-
-    // Check that copying boards of unequal size returns an error
-
-    HexBoard hexBoard4{board1Width + 1, board1Width};
-    HexBoard hexBoard5{board1Width, board1Width + 1};
-    HexBoard hexBoard6{board1Width + 1, board1Width + 1};
-
-    assert(CopyBoardState(hexBoard3, hexBoard4) == false);
-    assert(CopyBoardState(hexBoard3, hexBoard5) == false);
-    assert(CopyBoardState(hexBoard3, hexBoard6) == false);
-}
-
 void testAIPlayerConstructor()
 {
     int board1Width = 3;
@@ -426,6 +383,8 @@ void testAIPlayerGetMove()
     hexBoard2.MarkCell(move.X, move.Y, hexBoard2.P2);
 
     assert(hexBoard2.HasPlayerWon(hexBoard2.P2));
+
+    // Add swap test case
 }
 
 void runTests()
@@ -435,7 +394,6 @@ void runTests()
     testGetCell();
     testGameWonByPlayer1();
     testGameWonByPlayer2();
-    testCopyBoardState();
     testAIPlayerGetMove();
 }
 

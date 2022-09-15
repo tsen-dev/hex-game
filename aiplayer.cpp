@@ -39,7 +39,9 @@ int AIPlayer::SampleMove(int move)
     int totalSamples = SampleCount;
     int samplerSamples;
 
-    CopyBoardState(MoveBoard, Board);
+    MoveBoard.P1 = Board.P1;
+    MoveBoard.P2 = Board.P2;
+    MoveBoard.BoardState = Board.BoardState;
     
     if (move == TRY_SWAP) MoveBoard.SwapPlayers();
     else MoveBoard.MarkCell(Moves[move].X, Moves[move].Y, MyPlayer);

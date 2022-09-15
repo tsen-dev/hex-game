@@ -37,6 +37,9 @@ int Sampler::SampleMove(int move, int sampleCount)
     for (int move = 0; move < Moves.size(); ++move) 
         moveIndices[move] = move;
 
+    SampleBoard.P1 = MoveBoard.P1;
+    SampleBoard.P2 = MoveBoard.P2;
+
     if (move != TRY_SWAP) // Remove the move to be sampled as it has been played, unless trying a swap
     {
         // Place the move to be removed at the back to make removal constant time
@@ -50,7 +53,7 @@ int Sampler::SampleMove(int move, int sampleCount)
 
     for (int sample = 0; sample < sampleCount; ++sample)
     {
-        CopyBoardState(SampleBoard, MoveBoard);          
+        SampleBoard.BoardState = MoveBoard.BoardState;          
 
         if (reverseUsed == true)
         {
