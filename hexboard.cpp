@@ -3,21 +3,31 @@
 
 #include "hexboard.h"
 
-// Create a hex board of size width x height
+/* Create a hex board of size width x height. Throws an std::invalid_argument exception if player markers (p1/p2) 
+are a reserved value (HexBoaard::EMPTY/HexBoard::OUT_OF_BOUNDS) */
 HexBoard::HexBoard(int width, int height, char p1, char p2, const std::string& p1Name, const std::string& p2Name) : 
     BoardState(width * height, HexBoard::EMPTY), Width{width}, Height{height}, P1{p1}, P2{p2}, 
-    P1Name{p1Name}, P2Name{p2Name}, VisitedCells(width * height, false) {}
+    P1Name{p1Name}, P2Name{p2Name}, VisitedCells(width * height, false) 
+{
+    if (P1 == HexBoard::EMPTY || P2 == HexBoard::EMPTY || P1 == HexBoard::OUT_OF_BOUNDS || P2 == HexBoard::OUT_OF_BOUNDS)
+        throw std::invalid_argument{"Player markers can't have reserved values HexBoard::EMPTY or HexBoard::OUT_OF_BOUNDS"};    
+}
 
 // Create a deep copy of the specified board
 HexBoard::HexBoard(const HexBoard& hexBoard) : 
     BoardState(hexBoard.BoardState), Width{hexBoard.Width}, Height{hexBoard.Height}, P1{hexBoard.P1}, P2{hexBoard.P2}, 
     P1Name{hexBoard.P1Name}, P2Name{hexBoard.P2Name}, VisitedCells(hexBoard.Width * hexBoard.Height, false) {}
 
-// Create a board using the configuration specified in settings
+/* Create a board using the configuration specified in settings. Throws an std::invalid_argument exception if player markers 
+are a reserved value (HexBoaard::EMPTY/HexBoard::OUT_OF_BOUNDS) */
 HexBoard::HexBoard(const Settings& settings) :
     BoardState(settings.BoardSize.first * settings.BoardSize.first, HexBoard::EMPTY), Width{settings.BoardSize.first}, 
     Height{settings.BoardSize.second}, P1{settings.PlayerMarkers.first}, P2{settings.PlayerMarkers.second}, 
-    P1Name{settings.PlayerNames.first}, P2Name{settings.PlayerNames.second}, VisitedCells(settings.BoardSize.first * settings.BoardSize.first, false) {}
+    P1Name{settings.PlayerNames.first}, P2Name{settings.PlayerNames.second}, VisitedCells(settings.BoardSize.first * settings.BoardSize.first, false) 
+{
+    if (P1 == HexBoard::EMPTY || P2 == HexBoard::EMPTY || P1 == HexBoard::OUT_OF_BOUNDS || P2 == HexBoard::OUT_OF_BOUNDS)
+        throw std::invalid_argument{"Player markers can't have reserved values HexBoard::EMPTY or HexBoard::OUT_OF_BOUNDS"};    
+}
 
 // Return the state of the cell (x, y) if (x, y) is in the bounds of the board. Otherwise return HexBoard::OUT_OF_BOUNDS
 char HexBoard::GetCell(int x, int y) const

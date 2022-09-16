@@ -9,11 +9,13 @@
 class HexBoard
 {
     public:
-        // Create a hex board of size width x height
+        /* Create a hex board of size width x height. Throws an std::invalid_argument exception if player markers (p1/p2) 
+        are a reserved value (HexBoaard::EMPTY/HexBoard::OUT_OF_BOUNDS) */
         HexBoard(int width = 7, int height = 7, char p1 = 'X', char p2 = 'O', const std::string& p1Name = "P1", const std::string& p2Name = "P2");        
         // Create a deep copy of the specified board
         HexBoard(const HexBoard& hexBoard);         
-        // Create a board using the configuration specified in settings        
+        /* Create a board using the configuration specified in settings. Throws an std::invalid_argument exception if player markers 
+        are a reserved value (HexBoaard::EMPTY/HexBoard::OUT_OF_BOUNDS) */
         HexBoard(const Settings& settings); 
         // Return the state of the cell (x, y) if (x, y) is in the bounds of the board. Otherwise return HexBoard::OUT_OF_BOUNDS
         char GetCell(int x, int y) const; 

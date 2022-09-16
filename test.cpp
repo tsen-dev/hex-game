@@ -25,6 +25,37 @@ void testCreateEmptyBoard()
     }
 }
 
+void testHexBoardInvalidConstruction()
+{
+    // Check that an exception is thrown on invalid construction;
+
+    bool exceptionThrown = false;
+
+    try { HexBoard{7, 7, HexBoard::EMPTY, 'O'}; }
+
+    catch (const std::invalid_argument& ex) { exceptionThrown = true; } 
+
+    assert(exceptionThrown);
+
+    exceptionThrown = false;
+
+    try { HexBoard{7, 7, HexBoard::OUT_OF_BOUNDS, 'O'}; }
+
+    catch (const std::invalid_argument& ex) { exceptionThrown = true; } 
+
+    assert(exceptionThrown);
+
+    // Check that an exception is not thrown on valid construction;
+
+    exceptionThrown = false;
+
+    try { HexBoard{}; }
+
+    catch (const std::invalid_argument& ex) { exceptionThrown = true; } 
+
+    assert(!exceptionThrown);
+}
+
 void testMarkCell()
 {
     int boardWidth = 5;
@@ -439,6 +470,7 @@ void testAIPlayerGetMove()
 void runTests()
 {
     testCreateEmptyBoard();
+    testHexBoardInvalidConstruction();
     testMarkCell();  
     testGetCell();
     testGameWonByPlayer1();
