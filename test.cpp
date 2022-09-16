@@ -285,7 +285,7 @@ void testGameWonByPlayer2()
     }
 }
 
-void testAIPlayerConstructor()
+void testAIPlayerGetAvailableMoves()
 {
     int board1Width = 3;
     int board1Height = 5;
@@ -298,6 +298,7 @@ void testAIPlayerConstructor()
         hexBoard.MarkCell(i, i, hexBoard.P1); 
 
     AIPlayer aiPlayer{};
+    aiPlayer.GetAvailableMoves(hexBoard);
 
     // Check that all unoccupied cells are available to aiPlayer as a move, and no occupied cells are
 
@@ -306,7 +307,7 @@ void testAIPlayerConstructor()
         for (int col = 0; col < hexBoard.Width; ++col)
         {            
             auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
-                [col, row](const Move& move){return move.X == col && move.Y == row;}); 
+                [col, row](const Move& move){return move == Move{col, row};}); 
             bool moveFound = move != aiPlayer.Moves.end();
             assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
         }
@@ -347,7 +348,7 @@ void testAIPlayerGetMove()
     assert(hexBoard.HasPlayerWon(hexBoard.P2));
 
     /*
-    Check that the AIPlayer chooses to finish off a right-side upward path
+    Check that the AIPlayer chooses to finish off a right-side upward path as P2
            . - . - . - . - . - . - . 
             \ / \ / \ / \ / \ / \ / \ 
              . - . - . - . - . - . - O 
@@ -367,17 +368,72 @@ void testAIPlayerGetMove()
     int board2Height = 11;
 
     HexBoard hexBoard2{board2Width, board2Height};
-    AIPlayer aiPlayer2{};
 
     for (int i = board2Height - 1; i > 0; --i)
         hexBoard2.MarkCell(board2Width - 1, i, hexBoard2.P2);
     
-    move = aiPlayer2.GetMove(hexBoard2, hexBoard2.P2, false);
+    move = aiPlayer.GetMove(hexBoard2, hexBoard2.P2, false);
     hexBoard2.MarkCell(move.X, move.Y, hexBoard2.P2);
 
     assert(hexBoard2.HasPlayerWon(hexBoard2.P2));
 
-    // Add swap test case
+    /*
+    Check that the AIPlayer chooses to finish off a horizontal path as P1
+           X - X - X - X - X - X - . 
+            \ / \ / \ / \ / \ / \ / \ 
+             . - . - . - . - . - . - . 
+              \ / \ / \ / \ / \ / \ / \
+               . - . - . - . - . - . - . 
+                \ / \ / \ / \ / \ / \ / \
+                 . - . - . - . - . - . - .
+                  \ / \ / \ / \ / \ / \ / \
+                   . - . - . - . - . - . - . 
+                    \ / \ / \ / \ / \ / \ / \
+                     . - . - . - . - . - . - . 
+                      \ / \ / \ / \ / \ / \ / \ 
+                       . - . - . - . - . - . - . 
+    */
+
+    int board3Width = 11;
+    int board3Height = 11;
+
+    HexBoard hexBoard3{board3Width, board3Height};
+
+    for (int i = 0; i < board3Width; ++i)
+        hexBoard3.MarkCell(i, 0, hexBoard3.P1);
+    
+    move = aiPlayer.GetMove(hexBoard3, hexBoard3.P1, false);
+    hexBoard3.MarkCell(move.X, move.Y, hexBoard3.P1);
+
+    assert(hexBoard3.HasPlayerWon(hexBoard3.P1));
+
+    /*
+    Check that the AIPlayer chooses to swap P2
+           X - X - X - X - X - X - . 
+            \ / \ / \ / \ / \ / \ / \ 
+             . - . - . - . - . - . - . 
+              \ / \ / \ / \ / \ / \ / \
+               . - . - . - . - . - . - . 
+                \ / \ / \ / \ / \ / \ / \
+                 . - . - . - . - . - . - .
+                  \ / \ / \ / \ / \ / \ / \
+                   . - . - . - . - . - . - . 
+                    \ / \ / \ / \ / \ / \ / \
+                     . - . - . - . - . - . - . 
+                      \ / \ / \ / \ / \ / \ / \ 
+                       . - . - . - . - . - . - . 
+    */
+
+    int board4Width = 11;
+    int board4Height = 11;
+
+    HexBoard hexboard4{board4Width, board4Height};
+
+    for (int i = 0; i < board4Width; ++i)
+        hexboard4.MarkCell(i, 0, hexboard4.P1);
+    
+    move = aiPlayer.GetMove(hexboard4, hexboard4.P2, true);
+    assert(move == AIPlayer::SWAP);
 }
 
 void runTests()

@@ -18,8 +18,7 @@ class AIPlayer
         Move GetMove(const HexBoard& hexBoard, char myPlayer, bool firstMove);
 
         // Test functions
-        friend void testAIPlayerConstructor();
-        friend void testRemoveMove();
+        friend void testAIPlayerGetAvailableMoves();
 
         static const Move SWAP;        
         static const int TRY_SWAP = Sampler::TRY_SWAP;
@@ -38,7 +37,6 @@ class AIPlayer
         HexBoard MoveBoard; // A board that a move to be tested will be played on
         std::vector<Sampler> Samplers;   
         ThreadPool ThreadPool;
-
 };
 
 #endif

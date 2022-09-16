@@ -33,8 +33,6 @@ Setting move to TRY_SWAP signals that (1) a swap should be simulated i.e. there 
 wasn't played, (2) the players of MoveBoard have been swapped */
 int Sampler::SampleMove(int move, int sampleCount)
 {    
-    char myPlayer = MyPlayer;
-
     std::vector<int> moveIndices(Moves.size());
     for (int move = 0; move < Moves.size(); ++move) 
         moveIndices[move] = move;
@@ -48,7 +46,7 @@ int Sampler::SampleMove(int move, int sampleCount)
         moveIndices.pop_back();
     }
 
-    char currentPlayer = (myPlayer == MoveBoard.P1 ? MoveBoard.P2 : MoveBoard.P1);        
+    char currentPlayer = (MyPlayer == MoveBoard.P1 ? MoveBoard.P2 : MoveBoard.P1);        
     bool reverseUsed = true; // Use every shuffle twice: once forward and once in reverse to reduce to number of shuffles
     int wins = 0;
 
@@ -69,7 +67,7 @@ int Sampler::SampleMove(int move, int sampleCount)
             reverseUsed = true;
         }
 
-        if (SampleBoard.HasPlayerWon(myPlayer) == true)
+        if (SampleBoard.HasPlayerWon(MyPlayer) == true)
             ++wins;
     }
 
