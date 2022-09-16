@@ -31,7 +31,7 @@ class HexBoard
                 
         const int Width;
         const int Height;
-        std::vector<char> BoardState;
+        std::vector<char> BoardState; // 1D array containing the board's state
         // Used when determining whether to check for a vertical or horizontal path in HasPlayerWon
         char P1;
         char P2;

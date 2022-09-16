@@ -313,40 +313,24 @@ void testAIPlayerConstructor()
     }
 }
 
-void testRemoveMove()
-{
-    int board1Width = 3;
-    int board1Height = 5;
-
-    HexBoard hexBoard{board1Width, board1Height};
-    AIPlayer aiPlayer{hexBoard};
-
-    // Check that each played move is removed from aiPlayer's list of available moves
-
-    for (int i = 0; i < std::min(board1Width, board1Height); ++i)
-    {
-        hexBoard.MarkCell(i, i, hexBoard.P1);
-        aiPlayer.RemoveMove(Move{i, i});
-    }
-
-    hexBoard.MarkCell(board1Width - 1, board1Height - 1, hexBoard.P2);
-    aiPlayer.RemoveMove(Move{board1Width - 1, board1Height - 1});
-
-    for (int row = 0; row < hexBoard.Height; ++row)
-    {
-        for (int col = 0; col < hexBoard.Width; ++col)
-        {            
-            auto move = std::find_if(aiPlayer.Moves.begin(), aiPlayer.Moves.end(), 
-                [col, row](const Move& move){return move.X == col && move.Y == row;});                 
-            bool moveFound = move != aiPlayer.Moves.end();            
-            assert((hexBoard.GetCell(col, row) == HexBoard::EMPTY && moveFound) || (hexBoard.GetCell(col, row) != HexBoard::EMPTY && !moveFound));
-        }            
-    }
-}
-
 void testAIPlayerGetMove()
 {
-    // Check that the AIPlayer chooses to finish off a left-side downward path
+    /*
+    Check that the AIPlayer chooses to finish off a left-side downward path
+           O - . - . - . - . - . - . 
+            \ / \ / \ / \ / \ / \ / \ 
+             O - . - . - . - . - . - . 
+              \ / \ / \ / \ / \ / \ / \
+               O - . - . - . - . - . - . 
+                \ / \ / \ / \ / \ / \ / \
+                 O - . - . - . - . - . - .
+                  \ / \ / \ / \ / \ / \ / \
+                   O - . - . - . - . - . - . 
+                    \ / \ / \ / \ / \ / \ / \
+                     O - . - . - . - . - . - . 
+                      \ / \ / \ / \ / \ / \ / \ 
+                       . - . - . - . - . - . - . 
+    */
 
     int board1Width = 11;
     int board1Height = 11;
@@ -355,17 +339,29 @@ void testAIPlayerGetMove()
     AIPlayer aiPlayer{hexBoard};
 
     for (int i = 0; i < board1Height - 1; ++i)
-    {
         hexBoard.MarkCell(0, i, hexBoard.P2);
-        aiPlayer.RemoveMove(Move{0, i});
-    }
     
-    Move move = aiPlayer.GetMove(false);
+    Move move = aiPlayer.GetMove(hexBoard, false);
     hexBoard.MarkCell(move.X, move.Y, hexBoard.P2);
 
     assert(hexBoard.HasPlayerWon(hexBoard.P2));
 
-    // Check that the AIPlayer chooses to finish off a right-side upward path
+    /*
+    Check that the AIPlayer chooses to finish off a right-side upward path
+           . - . - . - . - . - . - . 
+            \ / \ / \ / \ / \ / \ / \ 
+             . - . - . - . - . - . - O 
+              \ / \ / \ / \ / \ / \ / \
+               . - . - . - . - . - . - O 
+                \ / \ / \ / \ / \ / \ / \
+                 . - . - . - . - . - . - O
+                  \ / \ / \ / \ / \ / \ / \
+                   . - . - . - . - . - . - O 
+                    \ / \ / \ / \ / \ / \ / \
+                     . - . - . - . - . - . - O 
+                      \ / \ / \ / \ / \ / \ / \ 
+                       . - . - . - . - . - . - O 
+    */
 
     int board2Width = 11;
     int board2Height = 11;
@@ -374,12 +370,9 @@ void testAIPlayerGetMove()
     AIPlayer aiPlayer2{hexBoard2};
 
     for (int i = board2Height - 1; i > 0; --i)
-    {
         hexBoard2.MarkCell(board2Width - 1, i, hexBoard2.P2);
-        aiPlayer2.RemoveMove(Move{board2Width - 1, i});
-    }
     
-    move = aiPlayer2.GetMove(false);
+    move = aiPlayer2.GetMove(hexBoard2, false);
     hexBoard2.MarkCell(move.X, move.Y, hexBoard2.P2);
 
     assert(hexBoard2.HasPlayerWon(hexBoard2.P2));

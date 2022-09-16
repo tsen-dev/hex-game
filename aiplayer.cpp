@@ -13,22 +13,18 @@ AIPlayer::AIPlayer(HexBoard& hexBoard, int sampleCount, int samplerCount) :
     SampleCount{sampleCount}, MyPlayer{hexBoard.P2}, Board{hexBoard}, MoveBoard{hexBoard}, ThreadPool{samplerCount}
 {
     for (int sampler = 0; sampler < samplerCount; ++sampler)
-        Samplers.push_back(Sampler{sampler, MoveBoard, Moves, hexBoard.P2});
+        Samplers.push_back(Sampler{sampler, MoveBoard, Moves, hexBoard.P2});    
+}
+
+// Clear Moves and place all availables moves on the specified board into Moves
+void AIPlayer::GetAvailableMoves(const HexBoard& hexBoard)
+{
+    Moves.clear();
 
     for (int row = 0; row < hexBoard.Height; ++row)
         for (int col = 0; col < hexBoard.Width; ++col)
             if (hexBoard.GetCell(col, row) == HexBoard::EMPTY) 
                 Moves.push_back({col, row}); 
-}
-
-// Remove the specified move from Moves, if it exists
-void AIPlayer::RemoveMove(const Move& move)
-{    
-    auto moveItr = 
-        std::find(Moves.begin(), Moves.end(), move);
-
-    if (moveItr != Moves.end()) 
-        Moves.erase(moveItr);
 }
 
 /* If move is TRY_SWAP, swap MoveBoard's players, otherwise play the move to be sampled on MoveBoard. Then simulate 
@@ -64,11 +60,12 @@ int AIPlayer::SampleMove(int move)
     return wins;
 }
 
-/* Simulate SampleCount many random games for each of the remaining moves. If firstMove is true, also try swapping 
-the players instead of playing a move. Return the move resulting in the most number of wins, or SWAP if swapping was 
-more successful */
-Move AIPlayer::GetMove(bool firstMove)
+/* Simulate SampleCount many random games from hexBoard for each of the remaining moves. If firstMove is true, also try swapping the players 
+instead of playing a move. Return the move resulting in the most number of wins, or SWAP if swapping was more successful */      
+Move AIPlayer::GetMove(const HexBoard& hexBoard, bool firstMove)
 {
+    GetAvailableMoves(hexBoard);
+
     Move bestMove = Moves.front();
     int maxWins = 0;    
     int moveWins;

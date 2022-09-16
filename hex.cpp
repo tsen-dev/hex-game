@@ -85,7 +85,7 @@ Move playAIP2Turn(std::string& p2Name, char p2Marker, HexBoard& hexBoard, bool f
 {    
     std::cout << p2Name << (tolower(p2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                           
 
-    Move move = aiPlayer.GetMove(firstMove);
+    Move move = aiPlayer.GetMove(hexBoard, firstMove);
 
     if (move == AIPlayer::SWAP) 
     {
@@ -128,8 +128,6 @@ void startGame()
 
             p2FirstMove = false;
         }
-
-        aiPlayer.RemoveMove(move);
 
         if (hexBoard.HasPlayerWon(currentPlayer) == true) break;
         else currentPlayer = (currentPlayer == hexBoard.P1) ? hexBoard.P2 : hexBoard.P1; 
