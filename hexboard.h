@@ -26,11 +26,13 @@ class HexBoard
         /* Check if player has a winning path. A winning path is horizontal if player is player 1, vertical otherwise. 
         Return true if a winning path is found, false otherwise */
         bool HasPlayerWon(char player);
+        // Create a deep copy of the specified board
+        HexBoard& operator=(const HexBoard& hexBoard); 
         // Print the board, player names, and headers for each row and column
         friend std::ostream& operator<<(std::ostream& out, const HexBoard& HexBoard);
                 
-        const int Width;
-        const int Height;
+        int Width;
+        int Height;
         std::vector<char> BoardState; // 1D array containing the board's state
         // Used when determining whether to check for a vertical or horizontal path in HasPlayerWon
         char P1;

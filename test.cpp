@@ -297,7 +297,7 @@ void testAIPlayerConstructor()
     for (int i = 0; i < std::min(board1Width, board1Height); ++i)
         hexBoard.MarkCell(i, i, hexBoard.P1); 
 
-    AIPlayer aiPlayer{hexBoard};
+    AIPlayer aiPlayer{};
 
     // Check that all unoccupied cells are available to aiPlayer as a move, and no occupied cells are
 
@@ -336,12 +336,12 @@ void testAIPlayerGetMove()
     int board1Height = 11;
 
     HexBoard hexBoard{board1Width, board1Height};
-    AIPlayer aiPlayer{hexBoard};
+    AIPlayer aiPlayer{};
 
     for (int i = 0; i < board1Height - 1; ++i)
         hexBoard.MarkCell(0, i, hexBoard.P2);
     
-    Move move = aiPlayer.GetMove(hexBoard, false);
+    Move move = aiPlayer.GetMove(hexBoard, hexBoard.P2, false);
     hexBoard.MarkCell(move.X, move.Y, hexBoard.P2);
 
     assert(hexBoard.HasPlayerWon(hexBoard.P2));
@@ -367,12 +367,12 @@ void testAIPlayerGetMove()
     int board2Height = 11;
 
     HexBoard hexBoard2{board2Width, board2Height};
-    AIPlayer aiPlayer2{hexBoard2};
+    AIPlayer aiPlayer2{};
 
     for (int i = board2Height - 1; i > 0; --i)
         hexBoard2.MarkCell(board2Width - 1, i, hexBoard2.P2);
     
-    move = aiPlayer2.GetMove(hexBoard2, false);
+    move = aiPlayer2.GetMove(hexBoard2, hexBoard2.P2, false);
     hexBoard2.MarkCell(move.X, move.Y, hexBoard2.P2);
 
     assert(hexBoard2.HasPlayerWon(hexBoard2.P2));

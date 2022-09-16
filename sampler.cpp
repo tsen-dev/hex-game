@@ -3,8 +3,8 @@
 #include "move.h"
 
 // Create a sampler. The sampler's RandomEngine is seeded with sum of the current CPU clock and the specified id
-Sampler::Sampler(int id, HexBoard& moveBoard, std::vector<Move>& moves, char myPlayer) :
-ID{id}, MyPlayer{myPlayer}, MoveBoard{moveBoard}, SampleBoard{moveBoard}, Moves{moves}, RandomEngine{clock() + id} {}
+Sampler::Sampler(int id, const char& myPlayer, const HexBoard& moveBoard, const std::vector<Move>& moves) :
+    ID{id}, MyPlayer{myPlayer}, MoveBoard{moveBoard}, SampleBoard{moveBoard}, Moves{moves}, RandomEngine{clock() + id} {}
 
 /* Play all remaining moves on the SampleBoard, alternating players at each move. moveIndices indexes into Moves, 
 and is played in front order */
@@ -33,12 +33,13 @@ Setting move to TRY_SWAP signals that (1) a swap should be simulated i.e. there 
 wasn't played, (2) the players of MoveBoard have been swapped */
 int Sampler::SampleMove(int move, int sampleCount)
 {    
+    char myPlayer = MyPlayer;
+
     std::vector<int> moveIndices(Moves.size());
     for (int move = 0; move < Moves.size(); ++move) 
         moveIndices[move] = move;
 
-    SampleBoard.P1 = MoveBoard.P1;
-    SampleBoard.P2 = MoveBoard.P2;
+    SampleBoard = MoveBoard;
 
     if (move != TRY_SWAP) // Remove the move to be sampled as it has been played, unless trying a swap
     {
@@ -47,7 +48,7 @@ int Sampler::SampleMove(int move, int sampleCount)
         moveIndices.pop_back();
     }
 
-    char currentPlayer = (MyPlayer == MoveBoard.P1 ? MoveBoard.P2 : MoveBoard.P1);        
+    char currentPlayer = (myPlayer == MoveBoard.P1 ? MoveBoard.P2 : MoveBoard.P1);        
     bool reverseUsed = true; // Use every shuffle twice: once forward and once in reverse to reduce to number of shuffles
     int wins = 0;
 
@@ -68,7 +69,7 @@ int Sampler::SampleMove(int move, int sampleCount)
             reverseUsed = true;
         }
 
-        if (SampleBoard.HasPlayerWon(MyPlayer) == true)
+        if (SampleBoard.HasPlayerWon(myPlayer) == true)
             ++wins;
     }
 

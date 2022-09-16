@@ -12,11 +12,10 @@
 class AIPlayer
 {
     public:
-        // Creates an AIPlayer and writes all of hexBoard's unplayed moves into Moves
-        AIPlayer(HexBoard& hexBoard, int sampleCount = 1000, int samplerCount = 8);          
+        AIPlayer(int sampleCount = 1000, int samplerCount = 8);          
         /* Simulate SampleCount many random games from hexBoard for each of the remaining moves. If firstMove is true, also try swapping the players 
         instead of playing a move. Return the move resulting in the most number of wins, or SWAP if swapping was more successful */      
-        Move GetMove(const HexBoard& hexBoard, bool firstMove);
+        Move GetMove(const HexBoard& hexBoard, char myPlayer, bool firstMove);
 
         // Test functions
         friend void testAIPlayerConstructor();
@@ -35,7 +34,7 @@ class AIPlayer
         int SampleCount;        
         char MyPlayer;
         std::vector<Move> Moves; // The remaining moves that can be played
-        HexBoard& Board; // The main game board
+        HexBoard Board; // The main game board
         HexBoard MoveBoard; // A board that a move to be tested will be played on
         std::vector<Sampler> Samplers;   
         ThreadPool ThreadPool;

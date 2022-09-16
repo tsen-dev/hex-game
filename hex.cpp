@@ -85,7 +85,7 @@ Move playAIP2Turn(std::string& p2Name, char p2Marker, HexBoard& hexBoard, bool f
 {    
     std::cout << p2Name << (tolower(p2Name.back()) == 's' ? "'" : "'s") << " Turn:\n\n";                           
 
-    Move move = aiPlayer.GetMove(hexBoard, firstMove);
+    Move move = aiPlayer.GetMove(hexBoard, p2Marker, firstMove);
 
     if (move == AIPlayer::SWAP) 
     {
@@ -107,7 +107,7 @@ void startGame()
 {
     Settings settings{};
     HexBoard hexBoard{settings};
-    AIPlayer aiPlayer{hexBoard, settings.AIDifficulty, settings.AIThreadCount};    
+    AIPlayer aiPlayer{settings.AIDifficulty, settings.AIThreadCount};    
     Move move;
     bool p2FirstMove = true; // Whether it is player 2's first move 
     char currentPlayer = hexBoard.P1;

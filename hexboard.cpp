@@ -124,6 +124,23 @@ bool HexBoard::HasPlayerWon(char player)
 // Return the number of digits in n
 inline int numberOfDigits(int n) {return (n == 0) ? 1 : floor(log10(n)) + 1;}
 
+// Create a deep copy of the specified board
+HexBoard& HexBoard::operator=(const HexBoard& hexBoard)
+{
+    Width = hexBoard.Width;
+    Height = hexBoard.Height;
+
+    P1 = hexBoard.P1;
+    P2 = hexBoard.P2;
+
+    P1Name = hexBoard.P1Name;
+    P2Name = hexBoard.P2Name;
+    
+    BoardState = hexBoard.BoardState;
+
+    return *this;
+}
+
 // Print the board, player names, and headers for each row and column
 std::ostream& operator<<(std::ostream& out, const HexBoard& hexboard)
 {   
