@@ -20,8 +20,7 @@ class AIPlayer
         // Test functions
         friend void testAIPlayerGetAvailableMoves();
 
-        static const Move SWAP;        
-        static const int TRY_SWAP = Sampler::TRY_SWAP;
+        static const Move SWAP;                
 
     private:
         // Clear Moves and place all availables moves on the specified board into Moves
@@ -29,6 +28,8 @@ class AIPlayer
         /* If move is TRY_SWAP, swap MoveBoard's players, otherwise play the move to be sampled on MoveBoard. Then simulate 
         SampleCount many random games from MoveBoard's state and return the number of wins. move is an index into Moves */
         int SampleMove(int move);
+
+        static const int TRY_SWAP = Sampler::TRY_SWAP;
 
         int SampleCount;        
         char MyPlayer;
